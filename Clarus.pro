@@ -12,9 +12,6 @@ SOURCES += main.cpp \
 LIBS += -lopencv_highgui -lopencv_core
 LIBS += -L/usr/local/lib/clews/ -lsock
 
-include(deployment.pri)
-qtcAddDeployment()
-
 HEADERS += \
     VideoDevice.hpp \
     RemoteVideoFeed.hpp \
