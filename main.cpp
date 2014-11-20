@@ -67,7 +67,6 @@ void rtaListenerThread(std::string remoteHost)
 
 		while(true)
 		{
-
 		}
 	}
 	catch(const RtAudioError& rae)
@@ -90,7 +89,6 @@ void rtaSenderThread()
 
 	while(true)
 	{
-
 	}
 }
 
@@ -114,22 +112,6 @@ int main()
 
 	audioSenderThread.join();
 	audioListenerThread.join();
-
-//	thread listenerThread(paListenerThread);
-
-//	//Video Stuff
-//	VideoDevice* localVD = new VideoDevice(0, "Local Video");
-
-//	thread painterThread(vdPainterThread, localVD);
-//	thread serverThread(vdServerThread, localVD);
-
-//	sleep(2);
-//	thread clientThread(vdClientThread, "127.0.0.1");
-
-//	listenerThread.join();
-//	painterThread.join();
-//	serverThread.join();
-//	clientThread.join();
 
 	return 0;
 }
