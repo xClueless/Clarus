@@ -30,9 +30,6 @@ void vdViewerThread(std::string remoteHost)
 	serverConnection.open(remoteHost, VIDEO_SERVER_PORT);
 	serverConnection.setMessageWrapping(true);
 
-	string connectedString = serverConnection.isOpen() ? "open" : "closed";
-	cout << "Connection state: " << connectedString << endl;
-
 	RemoteVideoFeed rfv(serverConnection);
 
 	namedWindow("Remote Feed");
