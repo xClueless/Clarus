@@ -16,15 +16,19 @@ using namespace std;
 using namespace std::experimental;
 using namespace cv;
 
-void vdServerThread(VideoDevice* vd)
+#define VIDEO_SERVER_PORT 9007
+#define AUDIO_SERVER_PORT 9008
+
+void vdSenderThread(VideoDevice* vd)
 {
-	VideoServer vdServer(*vd, 9000);
+	VideoServer vdServer(*vd, VIDEO_SERVER_PORT);
 	vdServer.start();
 }
-void vdClientThread(std::string remoteHost)
+void vdViewerThread(std::string remoteHost)
 {
 	SocketClient serverConnection;
-	serverConnection.open(remoteHost, 9000);
+	serverConnection.open(remoteHost, VIDEO_SERVER_PORT);
+	serverConnection.setMessageWrapping(true);
 
 	string connectedString = serverConnection.isOpen() ? "open" : "closed";
 	cout << "Connection state: " << connectedString << endl;
@@ -50,12 +54,12 @@ void vdPainterThread(VideoDevice* vd)
 	}
 }
 
-void rtaListenerThread()
+void rtaListenerThread(std::string remoteHost)
 {
 	try
 	{
 		SocketClient* serverConnection = new SocketClient();
-		serverConnection->open("127.0.0.1", 9001);
+		serverConnection->open(remoteHost, AUDIO_SERVER_PORT);
 		serverConnection->setMessageWrapping(true);
 
 		AudioBouncer bouncer(serverConnection);
@@ -74,7 +78,7 @@ void rtaListenerThread()
 
 void rtaSenderThread()
 {
-	Socket server(9001);
+	Socket server(AUDIO_SERVER_PORT);
 	server.create();
 	server.listen();
 
@@ -92,9 +96,21 @@ void rtaSenderThread()
 
 int main()
 {
+	string remoteHost = "127.0.0.1";
+
 	thread audioSenderThread(rtaSenderThread);
 	sleep(1);
-	thread audioListenerThread(rtaListenerThread);
+	thread audioListenerThread(rtaListenerThread, remoteHost);
+
+	VideoDevice vd;
+	thread videoSenderThread(vdSenderThread, &vd);
+	sleep(1);
+	thread videoViewerThread(vdViewerThread, remoteHost);
+//	thread videoPainterThread(vdPainterThread, &vd);
+
+	videoSenderThread.join();
+	videoViewerThread.join();
+//	videoPainterThread.join();
 
 	audioSenderThread.join();
 	audioListenerThread.join();

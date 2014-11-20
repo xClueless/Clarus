@@ -5,8 +5,6 @@ using namespace cv;
 
 RemoteVideoFeed::RemoteVideoFeed(SocketConnectionBase& sc) : mSocketConnection(sc)
 {
-	mSocketConnection.setMessageWrapping(true);
-
 	cout << "Requesting rows" << endl;
 	mSocketConnection.write("SEND-FRAME-ROWS");
 	mFrameRows = mSocketConnection.readInt32();
