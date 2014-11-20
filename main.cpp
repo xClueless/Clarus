@@ -55,11 +55,11 @@ void rtaListenerThread(std::string remoteHost)
 {
 	try
 	{
-		SocketClient* serverConnection = new SocketClient();
-		serverConnection->open(remoteHost, AUDIO_SERVER_PORT);
-		serverConnection->setMessageWrapping(true);
+		SocketClient serverConnection;
+		serverConnection.open(remoteHost, AUDIO_SERVER_PORT);
+		serverConnection.setMessageWrapping(true);
 
-		AudioBouncer bouncer(serverConnection);
+		AudioBouncer bouncer(&serverConnection);
 		bouncer.recieve();
 
 		while(true)
