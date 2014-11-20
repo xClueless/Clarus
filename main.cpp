@@ -8,7 +8,6 @@
 #include "VideoServer.hpp"
 #include "RemoteVideoFeed.hpp"
 
-#include <RtAudio.h>
 #include "AudioUtil.hpp"
 #include "AudioBouncer.hpp"
 

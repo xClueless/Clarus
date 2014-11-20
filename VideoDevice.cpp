@@ -11,7 +11,7 @@ VideoDevice::VideoDevice(int deviceNumber, string windowName) : mVideoCapture(de
 		throw runtime_error("Failed to open capture device");
 	}
 
-	createWindow(mWindowName);
+//	createWindow(mWindowName);
 }
 
 void VideoDevice::createWindow(string windowName)
