@@ -92,16 +92,16 @@ void rtaSenderThread()
 
 int main()
 {
-    init_net();
+	init_net();
 	string remoteHost = "127.0.0.1";
 
 	thread audioSenderThread(rtaSenderThread);
-    sleepSeconds(1);
+	sleepSeconds(1);
 	thread audioListenerThread(rtaListenerThread, remoteHost);
 
 	VideoDevice vd;
 	thread videoSenderThread(vdSenderThread, &vd);
-    sleepSeconds(1);
+	sleepSeconds(1);
 	thread videoViewerThread(vdViewerThread, remoteHost);
 //	thread videoPainterThread(vdPainterThread, &vd);
 
@@ -112,6 +112,6 @@ int main()
 	audioSenderThread.join();
 	audioListenerThread.join();
 
-    cleanup_net();
+	cleanup_net();
 	return 0;
 }
