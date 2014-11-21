@@ -16,8 +16,8 @@ void printDevices()
 pair<uint32_t, bool> findDeviceID(string name, bool contains)
 {
 	RtAudio audio;
-    pair<uint32_t, bool> deviceID;
-    deviceID.second = false;
+	pair<uint32_t, bool> deviceID;
+	deviceID.second = false;
 
 	RtAudio::DeviceInfo devInfo;
 	for(size_t i=0;i<audio.getDeviceCount();i++)
@@ -29,15 +29,15 @@ pair<uint32_t, bool> findDeviceID(string name, bool contains)
 			{
 				if(devInfo.name.find(name) != string::npos)
 				{
-                    deviceID.first = i;
-                    deviceID.second = true;
+					deviceID.first = i;
+					deviceID.second = true;
 					break;
 				}
 			}
 			else if(devInfo.name == name)
 			{
-                deviceID.first = i;
-                deviceID.second = true;
+				deviceID.first = i;
+				deviceID.second = true;
 				break;
 			}
 		}
@@ -49,17 +49,17 @@ pair<uint32_t, bool> findDeviceID(string name, bool contains)
 pair<RtAudio::DeviceInfo, bool> findDeviceInfo(uint32_t deviceID)
 {
 	RtAudio audio;
-    pair<RtAudio::DeviceInfo, bool> device;
-    device.second = false;
+	pair<RtAudio::DeviceInfo, bool> device;
+	device.second = false;
 
 	RtAudio::DeviceInfo devInfo;
 	for(size_t i=0;i<audio.getDeviceCount();i++)
 	{
-        devInfo = audio.getDeviceInfo(i);
+		devInfo = audio.getDeviceInfo(i);
 		if(i==deviceID)
 		{
-            device.first = devInfo;
-            device.second = true;
+			device.first = devInfo;
+			device.second = true;
 		}
 	}
 	return device;
@@ -68,8 +68,8 @@ pair<RtAudio::DeviceInfo, bool> findDeviceInfo(uint32_t deviceID)
 pair<RtAudio::DeviceInfo, bool> findDeviceInfo(string name, bool contains)
 {
 	RtAudio audio;
-    pair<RtAudio::DeviceInfo, bool> device;
-    device.second = false;
+	pair<RtAudio::DeviceInfo, bool> device;
+	device.second = false;
 
 	RtAudio::DeviceInfo devInfo;
 	for(size_t i=0;i<audio.getDeviceCount();i++)
@@ -81,15 +81,15 @@ pair<RtAudio::DeviceInfo, bool> findDeviceInfo(string name, bool contains)
 			{
 				if(devInfo.name.find(name) != string::npos)
 				{
-                    device.first = devInfo;
-                    device.second = true;
+					device.first = devInfo;
+					device.second = true;
 					break;
 				}
 			}
 			else if(devInfo.name == name)
 			{
-                device.first = devInfo;
-                device.second = true;
+				device.first = devInfo;
+				device.second = true;
 				break;
 			}
 		}
@@ -99,11 +99,11 @@ pair<RtAudio::DeviceInfo, bool> findDeviceInfo(string name, bool contains)
 
 void printDevice(uint32_t deviceID)
 {
-    pair<RtAudio::DeviceInfo, bool> getInfo = findDeviceInfo(deviceID);
+	pair<RtAudio::DeviceInfo, bool> getInfo = findDeviceInfo(deviceID);
 
-    if(getInfo.second)
+	if(getInfo.second)
 	{
-        RtAudio::DeviceInfo devInfo = getInfo.first;
+		RtAudio::DeviceInfo devInfo = getInfo.first;
 		cout << "Device: " << devInfo.name << " OCs: " << devInfo.outputChannels << " ICs:" << devInfo.inputChannels << endl;
 	}
 	else
