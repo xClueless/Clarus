@@ -5,8 +5,16 @@ using namespace std;
 
 QByteArray readBytesFromSocket(QTcpSocket* socket, qint64 maxSize)
 {
-	QByteArray messageBuffer(maxSize, '!');
-	quint64 bytesRead = socket->read(messageBuffer.data(), maxSize);
+	qint64 bufferSize = maxSize;
+	qint64 bytesAvailable = socket->bytesAvailable();
+
+	if(bytesAvailable < maxSize)
+	{
+		bufferSize = bytesAvailable;
+	}
+
+	QByteArray messageBuffer(bufferSize, '!');
+	quint64 bytesRead = socket->read(messageBuffer.data(), bufferSize);
 	cout << "Read " << bytesRead << " bytes" << endl;
 	messageBuffer.resize(bytesRead);
 
