@@ -10,6 +10,7 @@ using namespace std;
 NetworkStream::NetworkStream(QTcpSocket* socket, QObject *parent) :
 	QObject(parent), mSocket(socket)
 {
+	mTextCodec = QTextCodec::codecForName("UTF-8");
 	hook();
 }
 
@@ -51,7 +52,7 @@ void NetworkStream::writeMessage(QString message)
 
 void NetworkStream::dataRecieved()
 {
-	if(mSocket->readyRead())
+	if(mSocket->bytesAvailable() != 0)
 	{
 		if(!mProcessingMessage)
 		{
@@ -68,11 +69,11 @@ void NetworkStream::dataRecieved()
 			{
 				//The message is ready.
 				mProcessingMessage = false;
-				QString message = mTextCodec.toUnicode(mMessageBuffer);
+				QString message = mTextCodec->toUnicode(mMessageBuffer);
 				emit messageReady(message);
 			}
 
-			if(mSocket->readyRead()) //There may be residual bytes from a new message.
+			if(mSocket->bytesAvailable() != 0) //There may be residual bytes from a new message.
 			{
 				dataRecieved();
 			}

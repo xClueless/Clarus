@@ -5,6 +5,7 @@
 #include <QTcpSocket>
 #include <QByteArray>
 #include <QString>
+#include <QTextCodec>
 
 class NetworkStream : public QObject
 {
@@ -12,7 +13,7 @@ private:
 	Q_OBJECT
 
 	QTcpSocket* mSocket;
-	QTextCodec mTextCodec;
+	QTextCodec* mTextCodec;
 
 	QByteArray mMessageBuffer;
 	qint32 mMessageSize;
@@ -21,11 +22,11 @@ private:
 	void readMessageSize();
 	void readAvailableData();
 
-	void writeMessage(QString m);
 public:
 	explicit NetworkStream(QTcpSocket* socket, QObject *parent = 0);
 	void hook();
 	void unhook();
+	void writeMessage(QString m);
 signals:
 	void messageReady(QString m);
 public slots:

@@ -16,9 +16,8 @@ void MessageClient::identify(QStringList currentClientNames)
 {
 	mClientStream.writeMessage("IDENTIFY");
 
-	waitForInternalMessage();
-	ChatMessage* clientName = mInternalMessages.dequeue();
-	if(clientName->message().isEmpty())
+	QString clientName = readInternalMessage();
+	if(clientName.isEmpty())
 	{
 		writeInternalMessage("SENT-EMPTY-NAME");
 		throw runtime_error("Remote host " + mSocket->localAddress().toString().toStdString()
@@ -37,8 +36,8 @@ void MessageClient::identify(QStringList currentClientNames)
 
 void MessageClient::sendIdentify()
 {
-	waitForInternalMessage();
-	QString ident = mInternalMessages.dequeue();
+	readInternalMessage();
+	QString ident = readInternalMessage();
 	if(ident != "IDENTIFY")
 	{
 		throw runtime_error("Remote host " + mSocket->localAddress().toString().toStdString()
@@ -47,8 +46,7 @@ void MessageClient::sendIdentify()
 
 	writeInternalMessage(mLocalClientName);
 
-	waitForInternalMessage();
-	QString welcome = mInternalMessages.dequeue();
+	QString welcome = readInternalMessage();
 	if(welcome != "WELCOME")
 	{
 		throw runtime_error("[MessageMarshaller] Remote host " + mSocket->localAddress().toString().toStdString()
@@ -72,13 +70,22 @@ void MessageClient::writeInternalMessage(QString messageString)
 	writeChatMessage(&internalMessage);
 }
 
+QString MessageClient::readInternalMessage()
+{
+	waitForInternalMessage();
+	ChatMessage* message = mInternalMessages.dequeue();
+	QString messageString = message->message();
+	delete message;
+	return messageString;
+}
+
 void MessageClient::readChatMessage(QString messageString)
 {
 	cout << "[MessageClient] Whole message is available. Reading it now." << endl;
 	try
 	{
 		ChatMessage* m = new ChatMessage(messageString, mRemoteClientName);
-		if(m->flags() == INTERNAL)
+		if(m->flags().type() == INTERNAL)
 		{
 			mInternalMessages.enqueue(m);
 		}

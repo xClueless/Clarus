@@ -73,7 +73,6 @@ void MessageMarshaller::connectToClient(QString clientHostname)
 		MessageClient* mc = new MessageClient(remoteClient);
 		mc->sendIdentify();
 		mClients[clientHostname] = mc;
-		mc->hook();
 	}
 	catch(const runtime_error& re)
 	{

@@ -1,5 +1,9 @@
 #include "MessageFlags.hpp"
 
+#include <stdexcept>
+
+using namespace std;
+
 MessageFlags::MessageFlags(const MessageType type) : mType(type)
 {
 }

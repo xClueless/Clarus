@@ -20,6 +20,7 @@ private:
 
 	void waitForInternalMessage();
 	void writeInternalMessage(QString messageString);
+	QString readInternalMessage();
 public:
 	explicit MessageClient(QTcpSocket* socket, QObject *parent = 0);
 	QString remoteClientName();
