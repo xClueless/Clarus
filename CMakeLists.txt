@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 2.8.4)
+SET(CMAKE_AUTOMOC ON)
 
 project("Clarus")
 INCLUDE(../clews/Clews.cmake)
@@ -11,6 +12,9 @@ find_library(OPENCV_HIGHGUI_LIBRARY NAMES opencv_highgui300 libopencv_highgui300
 find_library(OPENCV_VIDEOIO_LIBRARY NAMES opencv_videoio300 libopencv_videoio300 HINTS ${CMAKE_CURRENT_LIST_DIR}/lib)
 find_library(OPENCV_IMGCODECS_LIBRARY NAMES opencv_imgcodecs300 libopencv_imgcodecs300 HINTS ${CMAKE_CURRENT_LIST_DIR}/lib)
 find_library(OPENCV_IMGPROC_LIBRARY NAMES opencv_imgproc300 libopencv_imgproc300 HINTS ${CMAKE_CURRENT_LIST_DIR}/lib)
+find_package(Qt5Core REQUIRED)
+find_package(Qt5Widgets REQUIRED)
+find_package(Qt5Network REQUIRED)
 
 MESSAGE(STATUS "SOCK_LIBRARY: ${SOCK_LIBRARY}")
 MESSAGE(STATUS "RTAUDIO_LIBRARY: ${RTAUDIO_LIBRARY}")
@@ -20,6 +24,7 @@ MESSAGE(STATUS "OPENCV_VIDEOIO_LIBRARY: ${OPENCV_VIDEOIO_LIBRARY}")
 MESSAGE(STATUS "OPENCV_IMGCODECS_LIBRARY ${OPENCV_IMGCODECS_LIBRARY}")
 MESSAGE(STATUS "OPENCV_IMGPROC_LIBRARY ${OPENCV_IMGPROC_LIBRARY}")
 
+
 clews_target_link_libraries(${SOCK_LIBRARY})
 clews_target_link_libraries(${RTAUDIO_LIBRARY})
 clews_target_link_libraries(${OPENCV_CORE_LIBRARY})
@@ -27,3 +32,7 @@ clews_target_link_libraries(${OPENCV_HIGHGUI_LIBRARY})
 clews_target_link_libraries(${OPENCV_VIDEOIO_LIBRARY})
 clews_target_link_libraries(${OPENCV_IMGCODECS_LIBRARY})
 clews_target_link_libraries(${OPENCV_IMGPROC_LIBRARY})
+clews_target_link_libraries(Qt5::Core)
+clews_target_link_libraries(Qt5::Widgets)
+clews_target_link_libraries(Qt5::Network)
+
