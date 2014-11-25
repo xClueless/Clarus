@@ -10,6 +10,7 @@ MessageEndpoint::MessageEndpoint(ClientManager* clientManager, QTcpSocket* socke
 {
 	connect(&mNetworkStream, SIGNAL(messageReady(QString)), this, SLOT(readChatMessage(QString)));
 	connect(this, SIGNAL(internalMessageReady(ChatMessage*)), this, SLOT(processInternalMessage(ChatMessage*)));
+	connect(mSocket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(handleSocketError(QAbstractSocket::SocketError)));
 }
 
 MessageEndpoint::~MessageEndpoint()
@@ -97,5 +98,10 @@ void MessageEndpoint::setRemoteName(QString name)
 {
 	mRemoteName = name;
 	emit remoteNameChanged();
+}
+
+void MessageEndpoint::handleSocketError(QAbstractSocket::SocketError error)
+{
+	emit connectionFailed(ConnectionError(mSocket, error));
 }
 

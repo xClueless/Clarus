@@ -50,12 +50,13 @@ signals:
 	void messageReady(ChatMessage* m);
 	void internalMessageReady(ChatMessage* m);
 	void remoteNameChanged();
-
+	void connectionFailed(ConnectionError ce);
 public slots:
 	void readChatMessage(QString messageString);
 	void writeChatMessage(ChatMessage* m);
 	virtual void processInternalMessage(ChatMessage* m);
 	void setRemoteName(QString name);
+	void handleSocketError(QAbstractSocket::SocketError error);
 };
 
 #endif // MESSAGEENDPOINT_HPP

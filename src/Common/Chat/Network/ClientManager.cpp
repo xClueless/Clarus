@@ -80,6 +80,7 @@ void ClientManager::newClientConnected()
 	cout << "Got new client." << endl;
 
 	MessageServer* server = new MessageServer(this, newClient);
+	connect(server, SIGNAL(connectionFailed(ConnectionError)), this, SLOT(clientFailedToIdentify(ConnectionError)));
 	connect(server, SIGNAL(identificationSuccesful()), this, SLOT(clientIdentified()));
 	connect(server, SIGNAL(identificationFailed(ConnectionError)), this, SLOT(clientFailedToIdentify(ConnectionError)));
 	mServersThatNeedIdentification << server;
@@ -91,6 +92,7 @@ void ClientManager::connectToServer(QString serverHostname)
 	QTcpSocket* remoteServer = new QTcpSocket();
 
 	MessageClient* mc = new MessageClient(this, remoteServer);
+	connect(mc, SIGNAL(connectionFailed(ConnectionError)), this, SLOT(serverFailedToIdentifyUs(ConnectionError)));
 	connect(mc, SIGNAL(identificationSuccesful()), this, SLOT(serverIdentifiedUs()));
 	connect(mc, SIGNAL(identificationFailed(ConnectionError)), this, SLOT(serverFailedToIdentifyUs(ConnectionError)));
 	mClientsThatNeedToIdentify.append(mc);
