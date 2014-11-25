@@ -4,6 +4,6 @@
 #include <QByteArray>
 #include <QTcpSocket>
 
-QByteArray readBytesFromSocket(QTcpSocket* socket, qint64 maxSize);
+QByteArray readBytesFromSocket(QAbstractSocket* socket, qint64 maxSize);
 
 #endif // CLARUS_NETUTIL_HPP

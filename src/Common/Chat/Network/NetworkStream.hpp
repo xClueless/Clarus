@@ -2,7 +2,7 @@
 #define NETWORKSTREAM_HPP
 
 #include <QObject>
-#include <QTcpSocket>
+#include <QAbstractSocket>
 #include <QByteArray>
 #include <QString>
 #include <QTextCodec>
@@ -12,7 +12,7 @@ class NetworkStream : public QObject
 private:
 	Q_OBJECT
 
-	QTcpSocket* mSocket;
+	QAbstractSocket* mSocket;
 	QTextCodec* mTextCodec;
 
 	QByteArray mMessageBuffer;
@@ -23,7 +23,7 @@ private:
 	void readAvailableData();
 
 public:
-	explicit NetworkStream(QTcpSocket* socket, QObject *parent = 0);
+	explicit NetworkStream(QAbstractSocket* socket, QObject *parent = 0);
 	void hook();
 	void unhook();
 	void writeMessage(QString m);

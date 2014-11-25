@@ -3,7 +3,7 @@
 #include <iostream>
 using namespace std;
 
-QByteArray readBytesFromSocket(QTcpSocket* socket, qint64 maxSize)
+QByteArray readBytesFromSocket(QAbstractSocket* socket, qint64 maxSize)
 {
 	qint64 bufferSize = maxSize;
 	qint64 bytesAvailable = socket->bytesAvailable();

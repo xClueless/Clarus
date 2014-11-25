@@ -7,7 +7,7 @@
 
 using namespace std;
 
-NetworkStream::NetworkStream(QTcpSocket* socket, QObject *parent) :
+NetworkStream::NetworkStream(QAbstractSocket* socket, QObject *parent) :
 	QObject(parent), mSocket(socket)
 {
 	mTextCodec = QTextCodec::codecForName("UTF-8");
