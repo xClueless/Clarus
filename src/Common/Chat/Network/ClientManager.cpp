@@ -1,14 +1,20 @@
 #include "ClientManager.hpp"
+
 #include <stdexcept>
 #include <iostream>
+#include <QNetworkInterface>
 
 using namespace std;
 
 ClientManager::ClientManager(QString name, uint32_t port, QObject *parent) :
 	QObject(parent), mLocalName(name), mPort(port)
 {
-	mServerSocket = new QTcpServer();
+	mServerSocket = new QTcpServer(this);
 	connect(mServerSocket, SIGNAL(newConnection()), this, SLOT(newClientConnected()));
+
+	mBroadcastSocket = new QUdpSocket(this);
+	mBroadcastSocket->bind(mPort);
+	connect(mBroadcastSocket, SIGNAL(readyRead()), this, SLOT(processDatagrams()));
 }
 
 QString ClientManager::localName()
@@ -104,3 +110,31 @@ void ClientManager::setLocalName(QString name)
 	mLocalName = name;
 	emit localNameChanged();
 }
+
+void ClientManager::sendBroadcast()
+{
+	cout << "[ClientManager] Sending out broadcast for local clients." << endl;
+	mBroadcastSocket->connectToHost(QHostAddress::Broadcast, mPort, QIODevice::WriteOnly);
+	mBroadcastSocket->write("CONNECT_BACK");
+}
+
+void ClientManager::processDatagrams()
+{
+	while (mBroadcastSocket->hasPendingDatagrams()) {
+		QByteArray datagram;
+		datagram.resize(mBroadcastSocket->pendingDatagramSize());
+		QHostAddress sender;
+
+		mBroadcastSocket->readDatagram(datagram.data(), datagram.size(), &sender);
+		QString broadcastMessage(datagram.data());
+		if(broadcastMessage == "CONNECT_BACK")
+		{
+			connectToServer(sender.toString());
+		}
+		else
+		{
+			cout << "Ignoring broadcast message: " << broadcastMessage.toStdString() << " from " << sender.toString().toStdString() << endl;
+		}
+	}
+}
+

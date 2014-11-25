@@ -18,6 +18,10 @@ MainWindow::MainWindow(ClientManager* clientManager, QWidget* parent)
 	connect(mConnectToEndpointButton, SIGNAL(clicked()), this, SLOT(connectToEndpoint()));
 	mLayout->addWidget(mConnectToEndpointButton);
 
+	mBroadcastForEndpointsButton = new QPushButton("Find Local Clients", this);
+	connect(mBroadcastForEndpointsButton, SIGNAL(clicked()), mClientManager, SLOT(sendBroadcast()));
+	mLayout->addWidget(mBroadcastForEndpointsButton);
+
 	mEndpointListWidget = new EndpointListWidget(mClientManager, this);
 	mLayout->addWidget(mEndpointListWidget);
 }

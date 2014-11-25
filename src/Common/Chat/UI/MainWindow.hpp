@@ -17,6 +17,7 @@ private:
 	QVBoxLayout* mLayout;
 	LocalIdentityWidget* mLocalIdentityWidget;
 	QPushButton* mConnectToEndpointButton;
+	QPushButton* mBroadcastForEndpointsButton;
 	EndpointListWidget* mEndpointListWidget;
 public:
 	explicit MainWindow(ClientManager* clientManager, QWidget *parent = 0);

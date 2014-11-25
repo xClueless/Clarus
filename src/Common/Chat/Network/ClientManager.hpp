@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QTcpServer>
 #include <QTcpSocket>
+#include <QUdpSocket>
 #include <stdint.h>
 #include <QString>
 #include <QMap>
@@ -18,6 +19,8 @@ private:
 	Q_OBJECT
 
 	QTcpServer* mServerSocket;
+	QUdpSocket* mBroadcastSocket;
+
 	QString mLocalName;
 	uint32_t mPort;
 	QList<MessageEndpoint*> mIdentifiedEndpoints;
@@ -43,6 +46,8 @@ public slots:
 	void newClientConnected();
 	void connectToServer(QString serverHostname);
 	void setLocalName(QString name);
+	void sendBroadcast();
+	void processDatagrams();
 };
 
 #endif // CLIENTMANAGER_HPP
