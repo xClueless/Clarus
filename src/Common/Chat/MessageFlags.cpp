@@ -34,3 +34,17 @@ void MessageFlags::setType(MessageType type)
 {
 	mType = type;
 }
+
+QString MessageFlags::flagString()
+{
+	QString flagString;
+	if(mType == INTERNAL)
+	{
+		flagString += INTERNAL_CHAR;
+	}
+	else if(mType == PRIVATE)
+	{
+		flagString += PRIVATE_CHAR;
+	}
+	return flagString;
+}

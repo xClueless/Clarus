@@ -2,7 +2,7 @@
 #define MAIN_HPP
 
 #include <string>
-#include "VideoDevice.hpp"
+#include "Video/VideoDevice.hpp"
 
 struct options
 {

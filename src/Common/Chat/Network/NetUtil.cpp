@@ -15,7 +15,7 @@ QByteArray readBytesFromSocket(QTcpSocket* socket, qint64 maxSize)
 
 	QByteArray messageBuffer(bufferSize, '!');
 	quint64 bytesRead = socket->read(messageBuffer.data(), bufferSize);
-	cout << "Read " << bytesRead << " bytes" << endl;
+//	cout << "[NetUtil] Read " << bytesRead << " bytes" << endl;
 	messageBuffer.resize(bytesRead);
 
 	return messageBuffer;

@@ -13,17 +13,18 @@ private:
 	const char LIST_DELIMITER = ',';
 	const int MINIMUM_PARTS = 4;
 
-	QStringList mTargetClients;
+	QStringList mTargetEndpoints;
 	QString mMessage;
 	QString mSender = "SENDER_DEFAULT";
 	MessageFlags mMessageFlags;
 public:
 	ChatMessage(QString messageString, QString sender);
-	ChatMessage(MessageFlags flags, QStringList targetClients, QString message);
-	QStringList targetClients() const;
+	ChatMessage(MessageFlags flags, QStringList targetEndpoints, QString message);
+	QStringList targetEndpoints() const;
 	QString message() const;
 	QString messageString();
 	QString sender();
+	void setSender(QString sender);
 	MessageFlags flags();
 };
 

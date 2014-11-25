@@ -1,6 +1,5 @@
 #include "AudioUtil.hpp"
 
-
 using namespace std;
 
 void printDevices()

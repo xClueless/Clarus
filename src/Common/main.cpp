@@ -4,18 +4,18 @@
 
 #include <thread>
 
-//#include "VideoServer.hpp"
-//#include "RemoteVideoFeed.hpp"
+//#include "Video/VideoServer.hpp"
+//#include "Video/RemoteVideoFeed.hpp"
 
-//#include "AudioUtil.hpp"
-//#include "AudioBouncer.hpp"
+//#include "Audio/AudioUtil.hpp"
+//#include "Audio/AudioBouncer.hpp"
 
 //#include "TimeUtil.h"
 
-#include "ChatWindow.hpp"
 #include <QApplication>
-#include "MessageMarshaller.hpp"
-#include "ContactWindow.hpp"
+#include "Chat/Network/ClientManager.hpp"
+#include "Chat/UI/ChatWindow.hpp"
+#include "Chat/UI/ContactWindow.hpp"
 
 using namespace std;
 using namespace cv;
@@ -125,18 +125,21 @@ void qtThread(int argc, char** argv, options opts)
 {
 	QApplication a(argc, argv);
 
-	MessageMarshaller marshaller(opts.clientName.data(), CHAT_SERVER_PORT);
+	ClientManager clientManager(opts.clientName.data(), CHAT_SERVER_PORT);
 	try
 	{
-		marshaller.start();
+		clientManager.start();
 	}
 	catch(const runtime_error& re)
 	{
 		cerr << re.what() << endl;
 	}
 
-	ContactWindow contactWindow(&marshaller);
+	ContactWindow contactWindow(&clientManager);
 	contactWindow.show();
+
+	QObject::connect(&clientManager, SIGNAL(endpointIdentified(MessageEndpoint*)), &contactWindow, SLOT(endpointIdentified(MessageEndpoint*)));
+	clientManager.connectToServer("127.0.0.1");
 
 	a.exec();
 }
