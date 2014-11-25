@@ -7,7 +7,6 @@ EndpointListWidget::EndpointListWidget(ClientManager* clientManager, QWidget *pa
 
 	mLayout = new QGridLayout(this);
 	setLayout(mLayout);
-	this->setMinimumSize(400, 600);
 
 	connect(mClientManager, SIGNAL(endpointIdentified(MessageEndpoint*)), this, SLOT(endpointIdentified(MessageEndpoint*)));
 }
