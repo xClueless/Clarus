@@ -59,4 +59,6 @@ void ChatWindow::addMessageBox(QString messageDisplayString)
 
 	mMessageListWidget.addItem(listWidgetItem);
 	mMessageListWidget.setItemWidget(listWidgetItem, widget);
+
+	mMessageListWidget.scrollToBottom();
 }
