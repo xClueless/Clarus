@@ -17,6 +17,7 @@ class ClientManager : public QObject
 {
 private:
 	Q_OBJECT
+	const QString BROADCAST_CONNECT_STRING = "CONNECT_BACK";
 
 	QTcpServer* mServerSocket;
 	QUdpSocket* mBroadcastSocket;

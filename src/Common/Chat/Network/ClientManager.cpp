@@ -14,7 +14,6 @@ ClientManager::ClientManager(QString name, uint32_t port, QObject *parent) :
 
 	mBroadcastSocket = new QUdpSocket(this);
 	mBroadcastSocket->bind(mPort);
-	mBroadcastSocket->connectToHost(QHostAddress::Broadcast, mPort, QIODevice::WriteOnly);
 
 	connect(mBroadcastSocket, SIGNAL(readyRead()), this, SLOT(processDatagrams()));
 }
@@ -146,7 +145,8 @@ void ClientManager::setLocalName(QString name)
 void ClientManager::sendBroadcast()
 {
 	cout << "[ClientManager] Sending out broadcast for local clients." << endl;
-	mBroadcastSocket->write("CONNECT_BACK");
+	QByteArray broadcastConnectArray = BROADCAST_CONNECT_STRING.toUtf8();
+	mBroadcastSocket->writeDatagram(broadcastConnectArray, broadcastConnectArray.size(), QHostAddress::Broadcast, mPort);
 }
 
 void ClientManager::processDatagrams()
@@ -157,7 +157,7 @@ void ClientManager::processDatagrams()
 		QHostAddress sender;
 
 		mBroadcastSocket->readDatagram(datagram.data(), datagram.size(), &sender);
-		QString broadcastMessage(datagram.data());
+		QString broadcastMessage = QString::fromUtf8(datagram);
 		if(broadcastMessage == "CONNECT_BACK" && !endpointIsConnected(sender.toString()))
 		{
 			connectToServer(sender.toString());
