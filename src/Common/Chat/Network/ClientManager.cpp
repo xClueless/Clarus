@@ -14,6 +14,7 @@ ClientManager::ClientManager(QString name, uint32_t port, QObject *parent) :
 
 	mBroadcastSocket = new QUdpSocket(this);
 	mBroadcastSocket->bind(mPort);
+	mBroadcastSocket->connectToHost(QHostAddress::Broadcast, mPort);
 
 	connect(mBroadcastSocket, SIGNAL(readyRead()), this, SLOT(processDatagrams()));
 }
@@ -26,6 +27,22 @@ QString ClientManager::localName()
 bool ClientManager::endpointIsConnected(QString remoteName)
 {
 	for(MessageEndpoint* endpoint : mIdentifiedEndpoints)
+	{
+		if(endpoint->socket()->peerAddress().toString() == remoteName)
+		{
+			cout << "[ClientManager] Endpoint: " << remoteName.toStdString() << " is connected" << endl;
+			return true;
+		}
+	}
+	for(MessageEndpoint* endpoint : mServersThatNeedIdentification)
+	{
+		if(endpoint->socket()->peerAddress().toString() == remoteName)
+		{
+			cout << "[ClientManager] Endpoint: " << remoteName.toStdString() << " is connected" << endl;
+			return true;
+		}
+	}
+	for(MessageEndpoint* endpoint : mClientsThatNeedToIdentify)
 	{
 		if(endpoint->socket()->peerAddress().toString() == remoteName)
 		{
@@ -145,8 +162,9 @@ void ClientManager::setLocalName(QString name)
 void ClientManager::sendBroadcast()
 {
 	cout << "[ClientManager] Sending out broadcast for local clients." << endl;
-	QByteArray broadcastConnectArray = BROADCAST_CONNECT_STRING.toUtf8();
-	mBroadcastSocket->writeDatagram(broadcastConnectArray, broadcastConnectArray.size(), QHostAddress::Broadcast, mPort);
+//	QByteArray broadcastConnectArray = BROADCAST_CONNECT_STRING.toUtf8();
+//	mBroadcastSocket->writeDatagram(broadcastConnectArray, broadcastConnectArray.size(), QHostAddress::Broadcast, mPort);
+	mBroadcastSocket->write(BROADCAST_CONNECT_STRING.toUtf8());
 }
 
 void ClientManager::processDatagrams()
@@ -158,7 +176,7 @@ void ClientManager::processDatagrams()
 
 		mBroadcastSocket->readDatagram(datagram.data(), datagram.size(), &sender);
 		QString broadcastMessage = QString::fromUtf8(datagram);
-		if(broadcastMessage == "CONNECT_BACK" && !endpointIsConnected(sender.toString()))
+		if(broadcastMessage == "CONNECT_BACK" && !endpointIsConnected(sender.toString()) && sender != QHostAddress::LocalHost)
 		{
 			connectToServer(sender.toString());
 		}
