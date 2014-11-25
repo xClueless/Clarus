@@ -14,7 +14,6 @@ ClientManager::ClientManager(QString name, uint32_t port, QObject *parent) :
 
 	mBroadcastSocket = new QUdpSocket(this);
 	mBroadcastSocket->bind(mPort);
-	mBroadcastSocket->connectToHost(QHostAddress::Broadcast, mPort);
 
 	connect(mBroadcastSocket, SIGNAL(readyRead()), this, SLOT(processDatagrams()));
 }
@@ -51,6 +50,18 @@ bool ClientManager::endpointIsConnected(QString remoteName)
 		}
 	}
 	cout << "[ClientManager] Endpoint: " << remoteName.toStdString() << " is not connected" << endl;
+	return false;
+}
+
+bool ClientManager::isLocalAddress(QString remoteName)
+{
+	for(const QHostAddress& address : QNetworkInterface::allAddresses())
+	{
+		if(remoteName == address.toString())
+		{
+			return true;
+		}
+	}
 	return false;
 }
 
@@ -125,9 +136,6 @@ void ClientManager::newClientConnected()
 
 	newClient->open(QIODevice::ReadWrite);
 
-
-	cout << "Got new client." << endl;
-
 	MessageServer* server = new MessageServer(this, newClient);
 	connect(server, SIGNAL(connectionFailed(ConnectionError)), this, SLOT(clientFailedToIdentify(ConnectionError)));
 	connect(server, SIGNAL(identificationSuccesful()), this, SLOT(clientIdentified()));
@@ -162,9 +170,9 @@ void ClientManager::setLocalName(QString name)
 void ClientManager::sendBroadcast()
 {
 	cout << "[ClientManager] Sending out broadcast for local clients." << endl;
-//	QByteArray broadcastConnectArray = BROADCAST_CONNECT_STRING.toUtf8();
-//	mBroadcastSocket->writeDatagram(broadcastConnectArray, broadcastConnectArray.size(), QHostAddress::Broadcast, mPort);
-	mBroadcastSocket->write(BROADCAST_CONNECT_STRING.toUtf8());
+	QByteArray broadcastConnectArray = BROADCAST_CONNECT_STRING.toUtf8();
+	mBroadcastSocket->writeDatagram(broadcastConnectArray, broadcastConnectArray.size(), QHostAddress::Broadcast, mPort);
+//	mBroadcastSocket->write(BROADCAST_CONNECT_STRING.toUtf8());
 }
 
 void ClientManager::processDatagrams()
@@ -175,14 +183,15 @@ void ClientManager::processDatagrams()
 		QHostAddress sender;
 
 		mBroadcastSocket->readDatagram(datagram.data(), datagram.size(), &sender);
+		cout << "[ClientManager] Recieved UDP datagram from " << sender.toString().toStdString() << endl;
 		QString broadcastMessage = QString::fromUtf8(datagram);
-		if(broadcastMessage == "CONNECT_BACK" && !endpointIsConnected(sender.toString()) && sender != QHostAddress::LocalHost)
+		if(broadcastMessage == "CONNECT_BACK" && !endpointIsConnected(sender.toString()) && !isLocalAddress(sender.toString()))
 		{
 			connectToServer(sender.toString());
 		}
 		else
 		{
-			cout << "Ignoring broadcast message: " << broadcastMessage.toStdString() << " from " << sender.toString().toStdString() << endl;
+			cout << "[ClientManager] Ignoring broadcast message: " << broadcastMessage.toStdString() << " from " << sender.toString().toStdString() << endl;
 		}
 	}
 }

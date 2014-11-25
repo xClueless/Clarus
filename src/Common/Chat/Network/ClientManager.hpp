@@ -34,6 +34,7 @@ public:
 	QList<MessageEndpoint*> identifiedEndpoints();
 	QString localName();
 	bool endpointIsConnected(QString remoteName);
+	bool isLocalAddress(QString remoteName);
 signals:
 	void endpointIdentified(MessageEndpoint* endpoint);
 	void failedToConnectToEndpoint(MessageEndpoint* endpoint, ConnectionError connectionError);
