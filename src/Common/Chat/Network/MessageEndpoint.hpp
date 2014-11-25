@@ -45,7 +45,9 @@ public:
 	explicit MessageEndpoint(ClientManager* clientManager, QTcpSocket* socket, QObject *parent = 0);
 	virtual ~MessageEndpoint();
 	QString remoteName();
-
+	QTcpSocket* socket();
+	bool operator ==(MessageEndpoint* endpoint);
+	bool operator !=(MessageEndpoint* endpoint);
 signals:
 	void messageReady(ChatMessage* m);
 	void internalMessageReady(ChatMessage* m);

@@ -22,6 +22,20 @@ QString ClientManager::localName()
 	return mLocalName;
 }
 
+bool ClientManager::endpointIsConnected(QString remoteName)
+{
+	for(MessageEndpoint* endpoint : mIdentifiedEndpoints)
+	{
+		if(endpoint->socket()->peerAddress().toString() == remoteName)
+		{
+			cout << "[ClientManager] Endpoint: " << remoteName.toStdString() << " is connected" << endl;
+			return true;
+		}
+	}
+	cout << "[ClientManager] Endpoint: " << remoteName.toStdString() << " is not connected" << endl;
+	return false;
+}
+
 QList<MessageEndpoint*> ClientManager::identifiedEndpoints()
 {
 	return mIdentifiedEndpoints;
@@ -81,7 +95,18 @@ void ClientManager::start()
 void ClientManager::newClientConnected()
 {
 	QTcpSocket* newClient = mServerSocket->nextPendingConnection();
+	QString endpointString = newClient->peerAddress().toString();
+	if(endpointIsConnected(endpointString))
+	{
+		cerr << "[ClientManager] Client with address " << endpointString.toStdString() << " is already connected" << endl;
+		cerr << "[ClientManager] TODO Send notification of socket closure with a reason for doing so." << endl;
+		newClient->close();
+		delete newClient;
+		return;
+	}
+
 	newClient->open(QIODevice::ReadWrite);
+
 
 	cout << "Got new client." << endl;
 
@@ -95,6 +120,11 @@ void ClientManager::newClientConnected()
 
 void ClientManager::connectToServer(QString serverHostname)
 {
+	if(endpointIsConnected(serverHostname))
+	{
+		cerr << "[ClientManager] Client " << serverHostname.toStdString() << " is already connected. Ignoring request." << endl;
+		return;
+	}
 	QTcpSocket* remoteServer = new QTcpSocket();
 
 	MessageClient* mc = new MessageClient(this, remoteServer);
@@ -127,7 +157,7 @@ void ClientManager::processDatagrams()
 
 		mBroadcastSocket->readDatagram(datagram.data(), datagram.size(), &sender);
 		QString broadcastMessage(datagram.data());
-		if(broadcastMessage == "CONNECT_BACK")
+		if(broadcastMessage == "CONNECT_BACK" && !endpointIsConnected(sender.toString()))
 		{
 			connectToServer(sender.toString());
 		}

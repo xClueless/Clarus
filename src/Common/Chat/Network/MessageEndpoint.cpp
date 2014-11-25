@@ -83,6 +83,21 @@ QString MessageEndpoint::remoteName()
 	return mRemoteName;
 }
 
+QTcpSocket* MessageEndpoint::socket()
+{
+	return mSocket;
+}
+
+bool MessageEndpoint::operator ==(MessageEndpoint* endpoint)
+{
+	return endpoint->socket()->peerAddress().toString() == mSocket->peerAddress().toString();
+}
+
+bool MessageEndpoint::operator !=(MessageEndpoint* endpoint)
+{
+	return !(this==endpoint);
+}
+
 void MessageEndpoint::processInternalMessage(ChatMessage* m)
 {
 	cerr << "[MessageEndpoint] Internal message: " << m->message().toStdString()

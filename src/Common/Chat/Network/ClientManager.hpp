@@ -32,6 +32,7 @@ public:
 	explicit ClientManager(QString name, uint32_t port, QObject *parent = 0);
 	QList<MessageEndpoint*> identifiedEndpoints();
 	QString localName();
+	bool endpointIsConnected(QString remoteName);
 signals:
 	void endpointIdentified(MessageEndpoint* endpoint);
 	void failedToConnectToEndpoint(MessageEndpoint* endpoint, ConnectionError connectionError);
