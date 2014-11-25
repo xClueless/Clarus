@@ -6,7 +6,7 @@
 #include <QLineEdit>
 #include <QGridLayout>
 #include <QPushButton>
-#include <QSet>
+#include <QMap>
 #include "../Network/ClientManager.hpp"
 #include "ChatWindow.hpp"
 #include "EndpointButton.hpp"
@@ -15,8 +15,8 @@ class EndpointListWidget : public QWidget
 {
 private:
 	QGridLayout* mLayout;
-	QList<ChatWindow*> mChatWindows;
 	QList<ChatGroup*> mChatGroups;
+	QMap<ChatGroup*, ChatWindow*> mChatWindows;
 	QList<EndpointButton*> mEndpointButtons;
 	ClientManager* mClientManager;
 

@@ -1,6 +1,10 @@
 #include "LoginWidget.hpp"
 
 #include <QMessageBox>
+#include <stdexcept>
+#include <iostream>
+
+using namespace std;
 
 LoginWidget::LoginWidget(ClientManager* clientManager, QWidget* parent)
 	: QWidget(parent), mClientManager(clientManager)
@@ -53,6 +57,16 @@ void LoginWidget::login()
 	else
 	{
 		mClientManager->setLocalName(localName);
+		try
+		{
+			mClientManager->start();
+		}
+		catch(const runtime_error& re)
+		{
+			cerr << re.what() << endl;
+			cerr << "[LoginWidget] This should probably be handled via signals and slot." << endl;
+		}
+
 		hide();
 		mMainWindow->show();
 	}

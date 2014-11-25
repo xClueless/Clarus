@@ -39,14 +39,18 @@ void EndpointListWidget::endpointIdentified(MessageEndpoint* endpoint)
 void EndpointListWidget::openConversation(ChatGroup* group)
 {
 	disconnect(group, SIGNAL(messageReady(ChatMessage*)), this, SLOT(openNewConversation(ChatMessage*)));
-	ChatWindow* newChatWindow = new ChatWindow(group);
-	mChatWindows << newChatWindow;
-	newChatWindow->show();
+	if(!mChatWindows.contains(group))
+	{
+		mChatWindows[group] = new ChatWindow(group);
+	}
+
+	mChatWindows[group]->show();
+	mChatWindows[group]->raise();
 }
 
 void EndpointListWidget::openNewConversation(ChatMessage* message)
 {
 	ChatGroup* group = (ChatGroup*) sender();
 	openConversation(group);
-	mChatWindows.back()->displayMessage(message);
+	mChatWindows[group]->displayMessage(message);
 }

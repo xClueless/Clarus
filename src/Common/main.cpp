@@ -127,14 +127,6 @@ void qtThread(int argc, char** argv, options opts)
 	QApplication a(argc, argv);
 
 	ClientManager clientManager(opts.clientName.data(), CHAT_SERVER_PORT);
-	try
-	{
-		clientManager.start();
-	}
-	catch(const runtime_error& re)
-	{
-		cerr << re.what() << endl;
-	}
 
 	LoginWidget loginWidget(&clientManager);
 	loginWidget.show();
