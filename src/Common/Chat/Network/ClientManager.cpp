@@ -29,7 +29,7 @@ bool ClientManager::endpointIsConnected(QString remoteName)
 	{
 		if(endpoint->socket()->peerAddress().toString() == remoteName)
 		{
-			cout << "[ClientManager] Endpoint: " << remoteName.toStdString() << " is connected" << endl;
+//			cout << "[ClientManager] Endpoint: " << remoteName.toStdString() << " is connected" << endl;
 			return true;
 		}
 	}
@@ -37,7 +37,7 @@ bool ClientManager::endpointIsConnected(QString remoteName)
 	{
 		if(endpoint->socket()->peerAddress().toString() == remoteName)
 		{
-			cout << "[ClientManager] Endpoint: " << remoteName.toStdString() << " is connected" << endl;
+//			cout << "[ClientManager] Endpoint: " << remoteName.toStdString() << " is connected" << endl;
 			return true;
 		}
 	}
@@ -49,7 +49,7 @@ bool ClientManager::endpointIsConnected(QString remoteName)
 			return true;
 		}
 	}
-	cout << "[ClientManager] Endpoint: " << remoteName.toStdString() << " is not connected" << endl;
+//	cout << "[ClientManager] Endpoint: " << remoteName.toStdString() << " is not connected" << endl;
 	return false;
 }
 
