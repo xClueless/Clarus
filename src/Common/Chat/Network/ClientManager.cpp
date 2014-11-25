@@ -5,7 +5,7 @@
 using namespace std;
 
 ClientManager::ClientManager(QString name, uint32_t port, QObject *parent) :
-	QObject(parent), mName(name), mPort(port)
+	QObject(parent), mLocalName(name), mPort(port)
 {
 	mServerSocket = new QTcpServer();
 	connect(mServerSocket, SIGNAL(newConnection()), this, SLOT(newClientConnected()));
@@ -13,7 +13,7 @@ ClientManager::ClientManager(QString name, uint32_t port, QObject *parent) :
 
 QString ClientManager::localName()
 {
-	return mName;
+	return mLocalName;
 }
 
 QList<MessageEndpoint*> ClientManager::identifiedEndpoints()
@@ -34,11 +34,13 @@ void ClientManager::serverIdentifiedUs()
 
 }
 
-void ClientManager::serverFailedToIdentifyUs(IdentFailure identFail)
+void ClientManager::serverFailedToIdentifyUs(ConnectionError connectionError)
 {
 	MessageClient* client = (MessageClient*) sender();
+	emit failedToConnectToEndpoint(client, connectionError);
+
 	mClientsThatNeedToIdentify.removeOne(client);
-	delete client;
+	client->deleteLater();
 }
 
 void ClientManager::clientIdentified()
@@ -51,21 +53,22 @@ void ClientManager::clientIdentified()
 	addEnpointAsIdentified(server);
 }
 
-void ClientManager::clientFailedToIdentify(IdentFailure identFail)
+void ClientManager::clientFailedToIdentify(ConnectionError connectionError)
 {
 	MessageServer* server = (MessageServer*) sender();
+	emit failedToConnectToEndpoint(server, connectionError);
+
 	mServersThatNeedIdentification.removeOne(server);
-	delete server;
+	server->deleteLater();
 }
 
 void ClientManager::start()
 {
 	if(!mServerSocket->listen(QHostAddress::Any, mPort))
 	{
-		throw runtime_error("[ClientManager] Failed to listen to socket");
-
 		//Hack for testing.
-		mName = "Client";
+		mLocalName = "Client";
+		throw runtime_error("[ClientManager] Failed to listen to socket");
 	}
 }
 
@@ -78,7 +81,7 @@ void ClientManager::newClientConnected()
 
 	MessageServer* server = new MessageServer(this, newClient);
 	connect(server, SIGNAL(identificationSuccesful()), this, SLOT(clientIdentified()));
-	connect(server, SIGNAL(identificationFailed(IdentFailure)), this, SLOT(clientFailedToIdentify(IdentFailure)));
+	connect(server, SIGNAL(identificationFailed(ConnectionError)), this, SLOT(clientFailedToIdentify(ConnectionError)));
 	mServersThatNeedIdentification << server;
 	server->requestIdentification();
 }
@@ -89,7 +92,13 @@ void ClientManager::connectToServer(QString serverHostname)
 
 	MessageClient* mc = new MessageClient(this, remoteServer);
 	connect(mc, SIGNAL(identificationSuccesful()), this, SLOT(serverIdentifiedUs()));
-	connect(mc, SIGNAL(identificationFailed(IdentFailure)), this, SLOT(serverFailedToIdentifyUs(IdentFailure)));
+	connect(mc, SIGNAL(identificationFailed(ConnectionError)), this, SLOT(serverFailedToIdentifyUs(ConnectionError)));
 	mClientsThatNeedToIdentify.append(mc);
 	mc->connectToServer(serverHostname, mPort);
+}
+
+void ClientManager::setLocalName(QString name)
+{
+	mLocalName = name;
+	emit localNameChanged();
 }

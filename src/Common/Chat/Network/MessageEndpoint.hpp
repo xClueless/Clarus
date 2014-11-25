@@ -6,6 +6,7 @@
 #include <QTcpSocket>
 #include "NetworkStream.hpp"
 #include "../ChatMessage.hpp"
+#include "../ConnectionError.hpp"
 
 class ClientManager;
 
@@ -18,11 +19,6 @@ enum IdentState
 	SERVER_IDENTITY_REQUESTED = 4,
 	SERVER_IDENTITY_SENT = 5,
 	IDENTIFICATION_COMPLETE = 6
-};
-enum IdentFailure
-{
-	SENT_EMPTY_NAME = 0,
-	UNSPECIFIED_IDENT_ERROR = 1
 };
 
 class MessageEndpoint : public QObject

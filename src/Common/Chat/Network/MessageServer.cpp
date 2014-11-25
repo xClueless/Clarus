@@ -51,7 +51,7 @@ void MessageServer::handleIndentityMessage(ChatMessage* request)
 		{
 			cerr << "[MessageServer] An unhandled protocol error occured: " << request->message().toStdString() << endl;
 			mIdentState = CLIENT_IDENTIFIED;
-			emit identificationFailed(UNSPECIFIED_IDENT_ERROR);
+			emit identificationFailed(ConnectionError(IDENT_UNSPECIFIED_ERROR));
 		}
 	}
 }
@@ -64,7 +64,7 @@ void MessageServer::identityRecieved(ChatMessage* m)
 		cerr << "Remote host " + mSocket->localAddress().toString().toStdString()
 							+ " violated IDENTIFY protocol. They sent back an empty name.";
 		mIdentState = NOT_IDENTIFIED;
-		emit identificationFailed(SENT_EMPTY_NAME);
+		emit identificationFailed(ConnectionError(IDENT_SENT_EMPTY_NAME));
 	}
 	else
 	{

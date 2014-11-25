@@ -16,7 +16,7 @@ public:
 signals:
 	void unidentifiedClientSentMessage();
 	void identificationSuccesful();
-	void identificationFailed(IdentFailure identFail);
+	void identificationFailed(ConnectionError connectionError);
 public slots:
 	void processInternalMessage(ChatMessage* m);
 	void requestIdentification();

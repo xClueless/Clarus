@@ -15,7 +15,8 @@
 #include <QApplication>
 #include "Chat/Network/ClientManager.hpp"
 #include "Chat/UI/ChatWindow.hpp"
-#include "Chat/UI/ContactWindow.hpp"
+#include "Chat/UI/MainWindow.hpp"
+#include "Chat/UI/LoginWidget.hpp"
 
 using namespace std;
 using namespace cv;
@@ -135,11 +136,10 @@ void qtThread(int argc, char** argv, options opts)
 		cerr << re.what() << endl;
 	}
 
-	ContactWindow contactWindow(&clientManager);
-	contactWindow.show();
-
-	QObject::connect(&clientManager, SIGNAL(endpointIdentified(MessageEndpoint*)), &contactWindow, SLOT(endpointIdentified(MessageEndpoint*)));
-	clientManager.connectToServer("127.0.0.1");
+	LoginWidget loginWidget(&clientManager);
+	loginWidget.show();
+//	MainWindow mainWindow(&clientManager);
+//	mainWindow.show();
 
 	a.exec();
 }

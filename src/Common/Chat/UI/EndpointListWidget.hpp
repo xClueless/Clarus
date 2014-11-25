@@ -1,5 +1,5 @@
-#ifndef CONTACTWINDOW_HPP
-#define CONTACTWINDOW_HPP
+#ifndef ENDPOINTLISTWIDGET_HPP
+#define ENDPOINTLISTWIDGET_HPP
 
 #include <QWidget>
 #include <QString>
@@ -11,7 +11,7 @@
 #include "ChatWindow.hpp"
 #include "EndpointButton.hpp"
 
-class ContactWindow : public QWidget
+class EndpointListWidget : public QWidget
 {
 private:
 	QGridLayout* mLayout;
@@ -22,7 +22,8 @@ private:
 
 	Q_OBJECT
 public:
-	explicit ContactWindow(ClientManager* clientManager, QWidget *parent = 0);
+	explicit EndpointListWidget(ClientManager* clientManager, QWidget *parent = 0);
+	virtual ~EndpointListWidget();
 
 signals:
 	void connectToEndpoint(QString remoteHostname);
@@ -33,4 +34,4 @@ public slots:
 	void openConversation(ChatGroup* group);
 };
 
-#endif // CONTACTWINDOW_HPP
+#endif // ENDPOINTLISTWIDGET_HPP

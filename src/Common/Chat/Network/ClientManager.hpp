@@ -10,6 +10,7 @@
 #include "../ChatMessage.hpp"
 #include "MessageClient.hpp"
 #include "MessageServer.hpp"
+#include "../ConnectionError.hpp"
 
 class ClientManager : public QObject
 {
@@ -17,7 +18,7 @@ private:
 	Q_OBJECT
 
 	QTcpServer* mServerSocket;
-	QString mName;
+	QString mLocalName;
 	uint32_t mPort;
 	QList<MessageEndpoint*> mIdentifiedEndpoints;
 	QList<MessageServer*> mServersThatNeedIdentification;
@@ -30,16 +31,18 @@ public:
 	QString localName();
 signals:
 	void endpointIdentified(MessageEndpoint* endpoint);
-
+	void failedToConnectToEndpoint(MessageEndpoint* endpoint, ConnectionError connectionError);
+	void localNameChanged();
 protected slots:
 	void serverIdentifiedUs();
-	void serverFailedToIdentifyUs(IdentFailure identFail);
+	void serverFailedToIdentifyUs(ConnectionError connectionError);
 	void clientIdentified();
-	void clientFailedToIdentify(IdentFailure identFail);
+	void clientFailedToIdentify(ConnectionError connectionError);
 public slots:
 	void start();
 	void newClientConnected();
 	void connectToServer(QString serverHostname);
+	void setLocalName(QString name);
 };
 
 #endif // CLIENTMANAGER_HPP

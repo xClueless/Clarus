@@ -58,7 +58,7 @@ void MessageClient::handleIdentityMessage(ChatMessage* request)
 		if(request->message() == SENT_EMPTY_NAME_STRING)
 		{
 			mIdentState = NOT_IDENTIFIED;
-			emit identificationFailed(SENT_EMPTY_NAME);
+			emit identificationFailed(ConnectionError(IDENT_SENT_EMPTY_NAME));
 		}
 		else if(request->message() == IDENTIFIED_STRING)
 		{
@@ -69,7 +69,7 @@ void MessageClient::handleIdentityMessage(ChatMessage* request)
 		}
 		else
 		{
-			emit identificationFailed(UNSPECIFIED_IDENT_ERROR);
+			emit identificationFailed(ConnectionError(IDENT_UNSPECIFIED_ERROR));
 			mIdentState = NOT_IDENTIFIED;
 		}
 	}
@@ -92,7 +92,7 @@ void MessageClient::identityRecieved(ChatMessage* m)
 		cerr << "Remote host " + mSocket->localAddress().toString().toStdString()
 							+ " violated IDENTIFY protocol. They sent back an empty name.";
 		mIdentState = NOT_IDENTIFIED;
-		emit identificationFailed(SENT_EMPTY_NAME);
+		emit identificationFailed(ConnectionError(IDENT_SENT_EMPTY_NAME));
 	}
 	else
 	{

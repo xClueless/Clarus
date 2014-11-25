@@ -17,7 +17,7 @@ public slots:
 	void connectToServer(QString clientHostname, quint16 mPort);
 signals:
 	void identificationSuccesful();
-	void identificationFailed(IdentFailure identFail);
+	void identificationFailed(ConnectionError connectionError);
 };
 
 #endif // MESSAGESERVER_HPP
