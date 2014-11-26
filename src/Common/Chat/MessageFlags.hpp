@@ -14,9 +14,9 @@ enum MessageType
 class MessageFlags
 {
 private:
+	static const char RAW_CHAR = 'R';
 	static const char INTERNAL_CHAR = 'I';
 	static const char PRIVATE_CHAR = 'P';
-	static const char RAW_CHAR = 'R';
 
 	MessageType mType = RAW;
 	quint16 mEndpointListSize = 0;

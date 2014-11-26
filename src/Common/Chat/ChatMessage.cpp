@@ -23,11 +23,11 @@ ChatMessage::ChatMessage(QByteArray messageByteArray, QString sender)
 	QString endpointList = QString::fromUtf8(messageByteArray.left(mMessageFlags.endpointListSize()));
 	if(endpointList.contains(LIST_DELIMITER))
 	{
-		mTargetEndpoints = endpointList.split(LIST_DELIMITER);
+		setTargetEndpoints(endpointList.split(LIST_DELIMITER));
 	}
 	else
 	{
-		mTargetEndpoints << endpointList;
+		setTargetEndpoints(QStringList(mTargetEndpoints));
 	}
 	messageByteArray.remove(0, mMessageFlags.endpointListSize());
 
@@ -39,20 +39,28 @@ ChatMessage::ChatMessage(QByteArray messageByteArray, QString sender)
 	mSender = sender;
 }
 ChatMessage::ChatMessage(MessageType type, QStringList targetEndpoints, QString message)
-	: mTargetEndpoints(targetEndpoints)
 {
 	mMessageData = message.toUtf8();
+	setTargetEndpoints(targetEndpoints);
 	mMessageFlags.setType(type);
 }
 
 ChatMessage::ChatMessage(MessageType type, QStringList targetEndpoints, QByteArray messageData)
-	: mTargetEndpoints(targetEndpoints), mMessageData(messageData)
+	: mMessageData(messageData)
 {
+	setTargetEndpoints(targetEndpoints);
 	mMessageFlags.setType(type);
 }
 QStringList ChatMessage::targetEndpoints() const
 {
 	return mTargetEndpoints;
+}
+
+void ChatMessage::setTargetEndpoints(QStringList newTargetEndpoints)
+{
+	mTargetEndpoints = newTargetEndpoints;
+	mTargetEnpointsArray = mTargetEndpoints.join(LIST_DELIMITER).toUtf8();
+	mMessageFlags.setEndpointListSize(mTargetEnpointsArray.size());
 }
 QString ChatMessage::messageAsUTF8String() const
 {
@@ -65,12 +73,9 @@ QString ChatMessage::messageAsUTF8String() const
 
 QByteArray ChatMessage::messageBytes()
 {
-	QByteArray endpointListBytes = mTargetEndpoints.join(LIST_DELIMITER).toUtf8();
-	mMessageFlags.setEndpointListSize(endpointListBytes.size());
-
 	QByteArray messageByteArray;
 	messageByteArray += mMessageFlags.flagBytes();
-	messageByteArray += endpointListBytes;
+	messageByteArray += mTargetEnpointsArray;
 	messageByteArray += mMessageData;
 
 	return messageByteArray;

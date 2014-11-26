@@ -14,6 +14,8 @@ private:
 	const int MINIMUM_MESSAGE_BYTES = MessageFlags::FLAG_SECTION_BYTES;
 
 	QStringList mTargetEndpoints;
+	QByteArray mTargetEnpointsArray;
+
 	QByteArray mMessageData;
 	QString mSender = "SENDER_DEFAULT";
 	MessageFlags mMessageFlags;
@@ -24,11 +26,15 @@ public:
 	ChatMessage(QByteArray messageByteArray, QString sender);
 	ChatMessage(MessageType type, QStringList targetEndpoints, QString message);
 	ChatMessage(MessageType type, QStringList targetEndpoints, QByteArray messageData);
+
 	QStringList targetEndpoints() const;
-	QString messageAsUTF8String() const;
-	QByteArray messageBytes();
+	void setTargetEndpoints(QStringList newTargetEndpoints);
+
 	QString sender();
 	void setSender(QString sender);
+
+	QString messageAsUTF8String() const;
+	QByteArray messageBytes();
 	MessageFlags flags();
 };
 

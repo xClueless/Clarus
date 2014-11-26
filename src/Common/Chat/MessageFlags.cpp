@@ -73,7 +73,7 @@ MessageType MessageFlags::typeFromChar(char typeCharacter) const
 QString MessageFlags::flagString() const
 {
 	QString flagString;
-	flagString += "Type";
+	flagString += "Type: ";
 	flagString += typeAsChar();
 	flagString += " EndpointListSize: ";
 	flagString += QString::number(mEndpointListSize);
