@@ -56,13 +56,13 @@ void NetworkStream::readAvailableData()
 
 	QByteArray newData = readBytesFromSocket(mSocket, sizeDiff);
 	mMessageBuffer += newData;
-//	cout << "[NetworkStream] Read " << newData.size() << " bytes of new data." << endl;
+	cout << "[NetworkStream] Read " << newData.size() << " bytes of new data." << endl;
 }
 
 void NetworkStream::writeMessage(QString message)
 {
 	QByteArray messageBytes = message.toUtf8();
-	//	cout << "[NetworkStream] WRITE-MESSAGE '" << message.toStdString() << "' SIZE: " << messageSize << endl;
+	cout << "[NetworkStream] WRITE-MESSAGE '" << message.toStdString() << "' SIZE: " << message.length() << endl;
 	writeMessage(messageBytes);
 }
 

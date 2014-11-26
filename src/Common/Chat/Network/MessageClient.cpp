@@ -12,7 +12,7 @@ MessageClient::MessageClient(ClientManager* clientManager, QTcpSocket* socket, Q
 
 void MessageClient::connectToServer(QString clientHostname, quint16 mPort)
 {
-	mSocket->connectToHost(clientHostname, mPort);
+	mSocket->connectToHost(clientHostname, mPort, QIODevice::ReadWrite);
 }
 
 void MessageClient::sendName()

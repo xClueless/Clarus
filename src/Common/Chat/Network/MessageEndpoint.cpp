@@ -77,7 +77,7 @@ void MessageEndpoint::readChatMessage(QByteArray messageBytes)
 	}
 	catch(const runtime_error& re)
 	{
-		cerr << "[MessageEndpoint] " << re.what() << endl;
+		cerr << "[MessageEndpoint::readChatMessage(QByteArray)] Error: " << re.what() << endl;
 	}
 }
 
@@ -150,12 +150,15 @@ void MessageEndpoint::handleSocketError(QAbstractSocket::SocketError error)
 
 void MessageEndpoint::requestPixmap()
 {
+	cout << "[MessageEndpoint] Requesting remote pixmap." << endl;
 	writeInternalMessageString(PIXMAP_REQUEST_STRING);
 	mRemotePixmapState = PIXMAP_REQUESTED;
 }
 
 void MessageEndpoint::sendPixmap()
 {
+	cout << "[MessageEndpoint] Sending pixmap to remote." << endl;
+
 	QByteArray pixmapArray;
 	QBuffer pixmapBuffer(&pixmapArray);
 	pixmapBuffer.open(QIODevice::WriteOnly);
@@ -166,6 +169,8 @@ void MessageEndpoint::sendPixmap()
 
 void MessageEndpoint::recievePixmap(ChatMessage* m)
 {
+	cout << "[MessageEndpoint] Recieving pixmap to remote." << endl;
+
 	if(mRemotePixmap.loadFromData(m->messageBytes(), "PNG"))
 	{
 		mRemotePixmapState = PIXMAP_RECIEVED;
