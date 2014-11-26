@@ -16,7 +16,7 @@ MessageServer::MessageServer(ClientManager* clientManager, QTcpSocket* socket, Q
 void MessageServer::requestIdentification()
 {
 	cout << "[MessageServer] Requesting identification from client." << endl;
-	writeInternalMessageString(IDENTITY_REQUEST_STRING);
+	writeInternalMessageString(IDENTITY_REQUEST_STRING, IDENTIFICATION);
 	mIdentState = CLIENT_IDENTITY_REQUESTED;
 }
 
@@ -24,7 +24,7 @@ void MessageServer::handleIndentityMessage(ChatMessage* request)
 {
 	if(mIdentState == NOT_IDENTIFIED)
 	{
-		writeInternalMessageString(REQUIRES_IDENTIFICATON_STRING);
+		writeInternalMessageString(REQUIRES_IDENTIFICATON_STRING, IDENTIFICATION);
 		emit unidentifiedClientSentMessage();
 	}
 	else if(mIdentState == CLIENT_IDENTITY_REQUESTED)
@@ -60,7 +60,7 @@ void MessageServer::identityRecieved(ChatMessage* m)
 	QString clientName = m->messageDataAsUTF8String();
 	if(clientName.isEmpty())
 	{
-		writeInternalMessageString(SENT_EMPTY_NAME_STRING);
+		writeInternalMessageString(SENT_EMPTY_NAME_STRING, IDENTIFICATION);
 		cerr << "Remote host " + mSocket->localAddress().toString().toStdString()
 							+ " violated IDENTIFY protocol. They sent back an empty name.";
 		mIdentState = NOT_IDENTIFIED;
@@ -68,7 +68,7 @@ void MessageServer::identityRecieved(ChatMessage* m)
 	}
 	else
 	{
-		writeInternalMessageString(IDENTIFIED_STRING);
+		writeInternalMessageString(IDENTIFIED_STRING, IDENTIFICATION);
 		setRemoteName(clientName);
 		mIdentState = CLIENT_IDENTIFIED;
 
@@ -79,14 +79,14 @@ void MessageServer::sendIdentity()
 {
 	cout << "[MessageServer] Sending identity to client." << endl;
 
-	writeInternalMessageString(mClientManager->localName());
+	writeInternalMessageString(mClientManager->localName(), IDENTIFICATION);
 	mIdentState = SERVER_IDENTITY_SENT;
 }
 void MessageServer::processInternalMessage(ChatMessage* m)
 {
 //	cout << "[MessageServer] Processing internal message." << endl;
 
-	if(mIdentState != IDENTIFICATION_COMPLETE)
+	if(m->flags().type() != IDENTIFICATION)
 	{
 		handleIndentityMessage(m);
 	}

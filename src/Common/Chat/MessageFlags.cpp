@@ -54,16 +54,20 @@ QChar MessageFlags::typeAsChar() const
 {
 	switch(mType)
 	{
-		case INTERNAL: return INTERNAL_CHAR;
+		case IDENTIFICATION: return INDENTIFICATION_CHAR;
+		case ENDPOINT_PIXMAP_EXCHANGE: return ENDPOINT_PIXMAP_EXCHANGE_CHAR;
 		case PRIVATE: return PRIVATE_CHAR;
+		case PROTOCOL_ERROR: return PROTOCOL_ERROR_CHAR;
 		default: throw runtime_error("Unknown type flag: " + mType);
 	}
 }
 
 MessageType MessageFlags::typeFromChar(QChar typeCharacter) const
 {
-	if(typeCharacter == INTERNAL_CHAR) return INTERNAL;
+	if(typeCharacter == INDENTIFICATION_CHAR) return IDENTIFICATION;
+	if(typeCharacter == ENDPOINT_PIXMAP_EXCHANGE_CHAR) return ENDPOINT_PIXMAP_EXCHANGE;
 	if(typeCharacter == PRIVATE_CHAR) return PRIVATE;
+	if(typeCharacter == PROTOCOL_ERROR_CHAR) return PROTOCOL_ERROR;
 	throw runtime_error("Unknown type flag: " + typeCharacter.toLatin1());
 }
 

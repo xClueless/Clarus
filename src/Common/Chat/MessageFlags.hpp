@@ -6,8 +6,10 @@
 
 enum MessageType
 {
-	INTERNAL,
-	PRIVATE
+	IDENTIFICATION,
+	ENDPOINT_PIXMAP_EXCHANGE,
+	PRIVATE,
+	PROTOCOL_ERROR
 };
 enum MessageFormat
 {
@@ -21,10 +23,12 @@ private:
 	QChar RAW_CHAR = 'R';
 	QChar UTF8_CHAR = '8';
 
-	QChar INTERNAL_CHAR = 'I';
+	QChar INDENTIFICATION_CHAR = 'I';
+	QChar ENDPOINT_PIXMAP_EXCHANGE_CHAR = 'X';
 	QChar PRIVATE_CHAR = 'P';
+	QChar PROTOCOL_ERROR_CHAR = 'E';
 
-	MessageType mType = INTERNAL;
+	MessageType mType = PRIVATE;
 	MessageFormat mFormat = UTF8;
 
 	QChar typeAsChar() const;

@@ -24,16 +24,16 @@ MessageEndpoint::~MessageEndpoint()
 
 void MessageEndpoint::sendIdentError()
 {
-	writeInternalMessageString("NOT_IDENTIFIED");
+	writeInternalMessageString("NOT_IDENTIFIED", IDENTIFICATION);
 }
-void MessageEndpoint::writeInternalMessageString(QString messageString)
+void MessageEndpoint::writeInternalMessageString(QString messageString, MessageType type)
 {
-	writeInternalMessageBytes(messageString.toUtf8(), UTF8);
+	writeInternalMessageBytes(messageString.toUtf8(), type, UTF8);
 }
 
-void MessageEndpoint::writeInternalMessageBytes(QByteArray messageBytes, MessageFormat format)
+void MessageEndpoint::writeInternalMessageBytes(QByteArray messageBytes, MessageType type, MessageFormat format)
 {
-	ChatMessage internalMessage(MessageFlags(INTERNAL, format), messageBytes);
+	ChatMessage internalMessage(MessageFlags(type, format), messageBytes);
 	writeChatMessage(&internalMessage);
 }
 
@@ -81,7 +81,7 @@ void MessageEndpoint::readChatMessage(QByteArray messageBytes)
 	{
 		ChatMessage* m = new ChatMessage(messageBytes, mRemoteName);
 //		cout << "[MessageEndpoint] Message: " << m->messageString().toStdString() << endl;
-		if(m->flags().type() == INTERNAL)
+		if(m->flags().type() != PRIVATE)
 		{
 			emit internalMessageReady(m);
 		}
@@ -140,7 +140,7 @@ void MessageEndpoint::processInternalMessage(ChatMessage* m)
 	cout << "[MessageEndpoint] Processing internal message: " << m->messageDataAsUTF8String().toStdString() << endl;
 
 	//This isn't the best way to handle this.
-	if(m->messageDataAsUTF8String().contains("PIXMAP"))
+	if(m->flags().type() == ENDPOINT_PIXMAP_EXCHANGE)
 	{
 		handlePixmapMessage(m);
 	}
@@ -148,7 +148,7 @@ void MessageEndpoint::processInternalMessage(ChatMessage* m)
 	{
 		cerr << "[MessageEndpoint] Internal message: " << m->messageDataAsUTF8String().toStdString()
 			 << " not understood in current state: " << identStateString().toStdString() << endl;
-		writeInternalMessageString("UNKNOWN_COMMAND");
+		writeInternalMessageString("UNKNOWN_COMMAND", PROTOCOL_ERROR);
 		while(true)
 		{
 
@@ -202,7 +202,7 @@ void MessageEndpoint::handlePixmapMessage(ChatMessage* pixmapMessage)
 void MessageEndpoint::requestPixmap()
 {
 	cout << "[MessageEndpoint] Requesting remote pixmap." << endl;
-	writeInternalMessageString(PIXMAP_REQUEST_STRING);
+	writeInternalMessageString(PIXMAP_REQUEST_STRING, ENDPOINT_PIXMAP_EXCHANGE);
 	mRemotePixmapState = PIXMAP_REQUESTED;
 }
 
@@ -213,7 +213,7 @@ void MessageEndpoint::sendPixmap()
 	QBuffer pixmapBuffer(&pixmapArray);
 	pixmapBuffer.open(QIODevice::WriteOnly);
 	mClientManager->localPixmap().save(&pixmapBuffer, "PNG");
-	writeInternalMessageBytes(pixmapArray, RAW);
+	writeInternalMessageBytes(pixmapArray, ENDPOINT_PIXMAP_EXCHANGE, RAW);
 	mLocalPixmapState = PIXMAP_SENT;
 }
 
@@ -221,7 +221,7 @@ void MessageEndpoint::notifyRemoteAboutPixmapUpdate()
 {
 	cout << "[MessageEndpoint] Notifying remote about available pixmap update." << endl;
 	mLocalPixmapState = PIXMAP_UPDATE_AVAILABLE;
-	writeInternalMessageString(PIXMAP_UPDATE_AVAILABLE_STRING);
+	writeInternalMessageString(PIXMAP_UPDATE_AVAILABLE_STRING, ENDPOINT_PIXMAP_EXCHANGE);
 }
 
 void MessageEndpoint::recievePixmap(ChatMessage* m)
@@ -231,7 +231,7 @@ void MessageEndpoint::recievePixmap(ChatMessage* m)
 	if(mRemotePixmap.loadFromData(m->messageData(), "PNG"))
 	{
 		mRemotePixmapState = PIXMAP_RECIEVED;
-		writeInternalMessageString(PIXMAP_RECIEVED_STRING);
+		writeInternalMessageString(PIXMAP_RECIEVED_STRING, ENDPOINT_PIXMAP_EXCHANGE);
 		emit remotePixmapChanged();
 	}
 	else

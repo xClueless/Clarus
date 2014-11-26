@@ -53,13 +53,13 @@ protected:
 	NetworkStream mNetworkStream;
 	IdentState mIdentState = NOT_IDENTIFIED;
 
-	PixmapState mLocalPixmapState;
-	PixmapState mRemotePixmapState;
+	PixmapState mLocalPixmapState = PIXMAP_NOT_SENT;
+	PixmapState mRemotePixmapState = PIXMAP_NOT_SENT;
 
 	QPixmap mRemotePixmap;
 
-	void writeInternalMessageString(QString messageString);
-	void writeInternalMessageBytes(QByteArray messageBytes, MessageFormat format);
+	void writeInternalMessageString(QString messageString, MessageType type);
+	void writeInternalMessageBytes(QByteArray messageBytes, MessageType type, MessageFormat format);
 	void handlePixmapMessage(ChatMessage* pixmapMessage);
 
 	QString identStateString();
