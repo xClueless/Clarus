@@ -15,22 +15,6 @@ ChatMessage::ChatMessage(QByteArray messageByteArray, QString sender)
 	mMessageFlags = MessageFlags(messageByteArray.left(MessageFlags::FLAG_SECTION_BYTES));
 	messageByteArray.remove(0, MessageFlags::FLAG_SECTION_BYTES);
 
-	if(messageByteArray.size() < mMessageFlags.endpointListSize())
-	{
-		throw runtime_error("Failed to parse message. It has a smaller number of bytes than the EndpointListSize suggests.");
-	}
-
-	QString endpointList = QString::fromUtf8(messageByteArray.left(mMessageFlags.endpointListSize()));
-	if(endpointList.contains(LIST_DELIMITER))
-	{
-		setTargetEndpoints(endpointList.split(LIST_DELIMITER));
-	}
-	else
-	{
-		setTargetEndpoints(QStringList(mTargetEndpoints));
-	}
-	messageByteArray.remove(0, mMessageFlags.endpointListSize());
-
 	if(messageByteArray.size() <= 0)
 	{
 		throw runtime_error("Failed to parse message. Data section is empty.");
@@ -38,30 +22,14 @@ ChatMessage::ChatMessage(QByteArray messageByteArray, QString sender)
 	mMessageData = messageByteArray;
 	mSender = sender;
 }
-ChatMessage::ChatMessage(MessageType type, QStringList targetEndpoints, QString message)
+ChatMessage::ChatMessage(MessageType type, QString message) : mMessageFlags(type)
 {
 	mMessageData = message.toUtf8();
-	setTargetEndpoints(targetEndpoints);
-	mMessageFlags.setType(type);
 }
 
-ChatMessage::ChatMessage(MessageType type, QStringList targetEndpoints, QByteArray messageData)
-	: mMessageData(messageData)
+ChatMessage::ChatMessage(MessageType type, QByteArray messageData)
+	: mMessageData(messageData), mMessageFlags(type)
 {
-	setTargetEndpoints(targetEndpoints);
-	mMessageFlags.setType(type);
-}
-QStringList ChatMessage::targetEndpoints() const
-{
-	return mTargetEndpoints;
-}
-
-void ChatMessage::setTargetEndpoints(QStringList newTargetEndpoints)
-{
-	mTargetEndpoints = newTargetEndpoints;
-	mTargetEnpointsArray = mTargetEndpoints.join(LIST_DELIMITER).toUtf8();
-	mMessageFlags.setEndpointListSize(mTargetEnpointsArray.size());
-	cout << "[ChatMessage] Target enpdoints set to: " << mTargetEndpoints.join(LIST_DELIMITER).toStdString() << endl;
 }
 QString ChatMessage::messageAsUTF8String() const
 {
@@ -76,9 +44,7 @@ QByteArray ChatMessage::messageBytes()
 {
 	QByteArray messageByteArray;
 	messageByteArray += mMessageFlags.flagBytes();
-	messageByteArray += mTargetEnpointsArray;
 	messageByteArray += mMessageData;
-
 	return messageByteArray;
 }
 

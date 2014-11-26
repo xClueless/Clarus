@@ -13,9 +13,6 @@ private:
 	const char LIST_DELIMITER = ',';
 	const int MINIMUM_MESSAGE_BYTES = MessageFlags::FLAG_SECTION_BYTES;
 
-	QStringList mTargetEndpoints;
-	QByteArray mTargetEnpointsArray;
-
 	QByteArray mMessageData;
 	QString mSender = "SENDER_DEFAULT";
 	MessageFlags mMessageFlags;
@@ -24,11 +21,8 @@ private:
 	void processStringData(QByteArray messageByteArray);
 public:
 	ChatMessage(QByteArray messageByteArray, QString sender);
-	ChatMessage(MessageType type, QStringList targetEndpoints, QString message);
-	ChatMessage(MessageType type, QStringList targetEndpoints, QByteArray messageData);
-
-	QStringList targetEndpoints() const;
-	void setTargetEndpoints(QStringList newTargetEndpoints);
+	ChatMessage(MessageType type, QString message);
+	ChatMessage(MessageType type, QByteArray messageData);
 
 	QString sender();
 	void setSender(QString sender);

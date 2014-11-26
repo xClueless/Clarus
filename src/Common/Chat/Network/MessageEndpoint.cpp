@@ -27,13 +27,13 @@ void MessageEndpoint::sendIdentError()
 }
 void MessageEndpoint::writeInternalMessageString(QString messageString)
 {
-	ChatMessage internalMessage(INTERNAL, QStringList(mRemoteName), messageString);
+	ChatMessage internalMessage(INTERNAL, messageString);
 	writeChatMessage(&internalMessage);
 }
 
 void MessageEndpoint::writeInternalMessageBytes(QByteArray messageBytes)
 {
-	ChatMessage internalMessage(INTERNAL, QStringList(mRemoteName), messageBytes);
+	ChatMessage internalMessage(INTERNAL, messageBytes);
 	writeChatMessage(&internalMessage);
 }
 

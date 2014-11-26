@@ -9,7 +9,7 @@ using namespace std;
 MessageFlags::MessageFlags()
 {
 }
-MessageFlags::MessageFlags(const MessageType type, quint16 endpointListSize) : mType(type), mEndpointListSize(endpointListSize)
+MessageFlags::MessageFlags(const MessageType type) : mType(type)
 {
 }
 
@@ -24,7 +24,6 @@ MessageFlags::MessageFlags(QByteArray flagBytes)
 	QChar typeChar;
 	flagByteStream >> typeChar;
 	mType = typeFromChar(typeChar);
-	flagByteStream >> mEndpointListSize;
 }
 
 MessageType MessageFlags::type() const
@@ -35,16 +34,6 @@ MessageType MessageFlags::type() const
 void MessageFlags::setType(MessageType type)
 {
 	mType = type;
-}
-
-quint16 MessageFlags::endpointListSize() const
-{
-	return mEndpointListSize;
-}
-
-void MessageFlags::setEndpointListSize(quint16 listSize)
-{
-	mEndpointListSize = listSize;
 }
 
 QChar MessageFlags::typeAsChar() const
@@ -71,8 +60,6 @@ QString MessageFlags::flagString() const
 	QString flagString;
 	flagString += "Type: ";
 	flagString += typeAsChar();
-	flagString += " EndpointListSize: ";
-	flagString += QString::number(mEndpointListSize);
 	return flagString;
 }
 
@@ -81,6 +68,5 @@ QByteArray MessageFlags::flagBytes() const
 	QByteArray flagBytes;
 	QDataStream flagByteStream(&flagBytes, QIODevice::WriteOnly);
 	flagByteStream << typeAsChar();
-	flagByteStream << mEndpointListSize;
 	return flagBytes;
 }
