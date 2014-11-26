@@ -83,7 +83,7 @@ QString MessageFlags::flagString() const
 QByteArray MessageFlags::flagBytes() const
 {
 	QByteArray flagBytes;
-	QDataStream flagByteStream(flagBytes);
+	QDataStream flagByteStream(&flagBytes, QIODevice::WriteOnly);
 	flagByteStream << typeAsChar();
 	flagByteStream << mEndpointListSize;
 	return flagBytes;
