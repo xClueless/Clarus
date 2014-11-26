@@ -9,7 +9,8 @@ ChatMessage::ChatMessage(QByteArray messageByteArray, QString sender)
 {
 	if(messageByteArray.size() < MINIMUM_MESSAGE_BYTES)
 	{
-		throw runtime_error("Failed to parse message. It does not have the minimum number of bytes required.");
+		QString errorString = "[ChatMessage] Failed to parse message. It only has " + QString::number(mMessageData.size()) + " bytes however " + QString::number(MINIMUM_MESSAGE_BYTES) + " bytes are required.";
+		throw runtime_error(errorString.toStdString());
 	}
 
 	mMessageFlags = MessageFlags(messageByteArray.left(MessageFlags::FLAG_SECTION_BYTES));
@@ -17,7 +18,7 @@ ChatMessage::ChatMessage(QByteArray messageByteArray, QString sender)
 
 	if(messageByteArray.size() <= 0)
 	{
-		throw runtime_error("Failed to parse message. Data section is empty.");
+		throw runtime_error("[ChatMessage] Failed to parse message. Data section is empty.");
 	}
 	mMessageData = messageByteArray;
 	mSender = sender;
