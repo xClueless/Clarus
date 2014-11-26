@@ -127,8 +127,10 @@ void MessageEndpoint::processInternalMessage(ChatMessage* m)
 		cout << "[MessageEndpoint] Remote has recieved our pixmap." << endl;
 		mLocalPixmapState = PIXMAP_RECIEVED;
 	}
-	else if(mRemotePixmapState == PIXMAP_REQUESTED)
+	else if(mRemotePixmapState == PIXMAP_REQUESTED && m->flags().type() == RAW)
 	{
+		//Us: SEND_PIXMAP
+		//Remote: ${RAWPIXMAP}
 		recievePixmap(m);
 	}
 	else if(mRemotePixmapState == PIXMAP_SENT && m->messageDataAsUTF8String() == PIXMAP_UPDATE_AVAILABLE_STRING)
