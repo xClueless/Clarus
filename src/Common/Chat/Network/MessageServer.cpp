@@ -33,7 +33,7 @@ void MessageServer::handleIndentityMessage(ChatMessage* request)
 	}
 	else if(mIdentState == CLIENT_IDENTIFIED)
 	{
-		if(request->messageAsUTF8String() == IDENTITY_REQUEST_STRING)
+		if(request->messageDataAsUTF8String() == IDENTITY_REQUEST_STRING)
 		{
 			mIdentState = SERVER_IDENTITY_REQUESTED;
 			sendIdentity();
@@ -41,7 +41,7 @@ void MessageServer::handleIndentityMessage(ChatMessage* request)
 	}
 	else if(mIdentState == SERVER_IDENTITY_SENT)
 	{
-		if(request->messageAsUTF8String() == IDENTIFIED_STRING)
+		if(request->messageDataAsUTF8String() == IDENTIFIED_STRING)
 		{
 			cout << "[MessageServer] Identification complete." << endl;
 			mIdentState = IDENTIFICATION_COMPLETE;
@@ -49,7 +49,7 @@ void MessageServer::handleIndentityMessage(ChatMessage* request)
 		}
 		else
 		{
-			cerr << "[MessageServer] An unhandled protocol error occured: " << request->messageAsUTF8String().toStdString() << endl;
+			cerr << "[MessageServer] An unhandled protocol error occured: " << request->messageDataAsUTF8String().toStdString() << endl;
 			mIdentState = CLIENT_IDENTIFIED;
 			emit identificationFailed(ConnectionError(IDENT_UNSPECIFIED_ERROR));
 		}
@@ -57,7 +57,7 @@ void MessageServer::handleIndentityMessage(ChatMessage* request)
 }
 void MessageServer::identityRecieved(ChatMessage* m)
 {
-	QString clientName = m->messageAsUTF8String();
+	QString clientName = m->messageDataAsUTF8String();
 	if(clientName.isEmpty())
 	{
 		writeInternalMessageString(SENT_EMPTY_NAME_STRING);

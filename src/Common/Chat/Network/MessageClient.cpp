@@ -41,26 +41,26 @@ void MessageClient::handleIdentityMessage(ChatMessage* request)
 {
 	if(mIdentState == NOT_IDENTIFIED)
 	{
-		if(request->messageAsUTF8String() == IDENTITY_REQUEST_STRING)
+		if(request->messageDataAsUTF8String() == IDENTITY_REQUEST_STRING)
 		{
 			mIdentState = CLIENT_IDENTITY_REQUESTED;
 			sendName();
 		}
 		else
 		{
-			cerr << "[MessageClient] Server sent us an unexpected message '" << request->messageAsUTF8String().toStdString()
+			cerr << "[MessageClient] Server sent us an unexpected message '" << request->messageDataAsUTF8String().toStdString()
 				 << "' for state " << identStateString().toStdString() << endl;
 			writeInternalMessageString("NOT_YET_IDENTIFIED");
 		}
 	}
 	else if(mIdentState == CLIENT_IDENTITY_SENT)
 	{
-		if(request->messageAsUTF8String() == SENT_EMPTY_NAME_STRING)
+		if(request->messageDataAsUTF8String() == SENT_EMPTY_NAME_STRING)
 		{
 			mIdentState = NOT_IDENTIFIED;
 			emit identificationFailed(ConnectionError(IDENT_SENT_EMPTY_NAME));
 		}
-		else if(request->messageAsUTF8String() == IDENTIFIED_STRING)
+		else if(request->messageDataAsUTF8String() == IDENTIFIED_STRING)
 		{
 			cout << "[MessageClient] Server sent us confirmation of our identification." << endl;
 			cout << "[MessageClient] Asking server for its identification." << endl;
@@ -85,7 +85,7 @@ void MessageClient::handleIdentityMessage(ChatMessage* request)
 
 void MessageClient::identityRecieved(ChatMessage* m)
 {
-	QString serverName = m->messageAsUTF8String();
+	QString serverName = m->messageDataAsUTF8String();
 	if(serverName.isEmpty())
 	{
 		writeInternalMessageString(SENT_EMPTY_NAME_STRING);

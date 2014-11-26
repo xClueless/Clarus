@@ -37,13 +37,13 @@ void ChatWindow::messageReadyToSend()
 {
 	ChatMessage message(MessageFlags(PRIVATE, UTF8), mInputBox->text());
 	mGroup->messageAll(&message);
-	addMessageBox("Me:" + message.messageBytes());
+	addMessageBox("Me:" + message.rawMessageBytes());
 	mInputBox->clear();
 }
 
 void ChatWindow::displayMessage(ChatMessage* m)
 {
-	addMessageBox(m->sender() + ":" + m->messageBytes());
+	addMessageBox(m->sender() + ":" + m->rawMessageBytes());
 
 	QApplication::alert(this, 300);
 //	mMessageModel.setStringList(mMessages);

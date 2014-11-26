@@ -31,7 +31,7 @@ ChatMessage::ChatMessage(MessageFlags flags, QByteArray messageData)
 	: mMessageData(messageData), mMessageFlags(flags)
 {
 }
-QString ChatMessage::messageAsUTF8String() const
+QString ChatMessage::messageDataAsUTF8String() const
 {
 	if(mMessageFlags.format() == RAW)
 	{
@@ -39,8 +39,12 @@ QString ChatMessage::messageAsUTF8String() const
 	}
 	return QString::fromUtf8(mMessageData);
 }
+QByteArray ChatMessage::messageData() const
+{
+	return mMessageData;
+}
 
-QByteArray ChatMessage::messageBytes()
+QByteArray ChatMessage::rawMessageBytes()
 {
 	QByteArray messageByteArray;
 	messageByteArray += mMessageFlags.flagBytes();

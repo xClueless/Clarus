@@ -70,7 +70,7 @@ void MessageEndpoint::readChatMessage(QByteArray messageBytes)
 			}
 			else
 			{
-				cout << "[MessageEndpoint] Alerting subscribers to new message: " << m->messageAsUTF8String().toStdString() << endl;
+				cout << "[MessageEndpoint] Alerting subscribers to new message: " << m->messageDataAsUTF8String().toStdString() << endl;
 				emit messageReady(m);
 			}
 		}
@@ -84,7 +84,7 @@ void MessageEndpoint::readChatMessage(QByteArray messageBytes)
 void MessageEndpoint::writeChatMessage(ChatMessage* m)
 {
 	cout << "[MessageEndpoint] Writing message with flags: " << m->flags().flagString().toStdString() << endl;
-	mNetworkStream.writeMessage(m->messageBytes());
+	mNetworkStream.writeMessage(m->rawMessageBytes());
 }
 
 QString MessageEndpoint::remoteName()
@@ -114,11 +114,11 @@ bool MessageEndpoint::operator !=(MessageEndpoint* endpoint)
 
 void MessageEndpoint::processInternalMessage(ChatMessage* m)
 {
-	if(m->messageAsUTF8String() == PIXMAP_REQUEST_STRING)
+	if(m->messageDataAsUTF8String() == PIXMAP_REQUEST_STRING)
 	{
 		sendPixmap();
 	}
-	else if(mLocalPixmapState == PIXMAP_SENT && m->messageAsUTF8String() == PIXMAP_RECIEVED_STRING)
+	else if(mLocalPixmapState == PIXMAP_SENT && m->messageDataAsUTF8String() == PIXMAP_RECIEVED_STRING)
 	{
 		mLocalPixmapState = PIXMAP_RECIEVED;
 	}
@@ -128,7 +128,7 @@ void MessageEndpoint::processInternalMessage(ChatMessage* m)
 	}
 	else
 	{
-		cerr << "[MessageEndpoint] Internal message: " << m->messageAsUTF8String().toStdString()
+		cerr << "[MessageEndpoint] Internal message: " << m->messageDataAsUTF8String().toStdString()
 			 << " not understood in current state: " << identStateString().toStdString() << endl;
 		writeInternalMessageString("UNKNOWN_COMMAND");
 		while(true)
@@ -170,13 +170,17 @@ void MessageEndpoint::sendPixmap()
 
 void MessageEndpoint::recievePixmap(ChatMessage* m)
 {
-	cout << "[MessageEndpoint] Recieving pixmap from remote." << endl;
+	cout << "[MessageEndpoint] Recieved pixmap from remote." << endl;
 
-	if(mRemotePixmap.loadFromData(m->messageBytes(), "PNG"))
+	if(mRemotePixmap.loadFromData(m->messageData(), "PNG"))
 	{
 		mRemotePixmapState = PIXMAP_RECIEVED;
 		writeInternalMessageString(PIXMAP_RECIEVED_STRING);
 	}
-	m->messageBytes();
+	else
+	{
+		cerr << "[MessageEndpoint] Failed to load remote pixmap." << endl;
+		mRemotePixmapState = PIXMAP_NOT_SENT;
+	}
 }
 

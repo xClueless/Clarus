@@ -27,8 +27,10 @@ public:
 	QString sender();
 	void setSender(QString sender);
 
-	QString messageAsUTF8String() const;
-	QByteArray messageBytes();
+	QString messageDataAsUTF8String() const;
+	QByteArray messageData() const;
+	QByteArray rawMessageBytes();
+
 	MessageFlags flags();
 };
 
