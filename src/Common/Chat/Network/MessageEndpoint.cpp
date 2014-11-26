@@ -158,7 +158,7 @@ void MessageEndpoint::sendPixmap()
 {
 	QByteArray pixmapArray;
 	QBuffer pixmapBuffer(&pixmapArray);
-	pixmapBuffer.open(QIODevice::ReadOnly);
+	pixmapBuffer.open(QIODevice::WriteOnly);
 	mClientManager->localPixmap().save(&pixmapBuffer, "PNG");
 	writeInternalMessageBytes(pixmapArray);
 	mLocalPixmapState = PIXMAP_SENT;
