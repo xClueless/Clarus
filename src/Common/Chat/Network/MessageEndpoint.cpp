@@ -122,6 +122,7 @@ void MessageEndpoint::processInternalMessage(ChatMessage* m)
 	}
 	else if(mLocalPixmapState == PIXMAP_SENT && m->messageDataAsUTF8String() == PIXMAP_RECIEVED_STRING)
 	{
+		cout << "[MessageEndpoint] Remote has recieved our pixmap." << endl;
 		mLocalPixmapState = PIXMAP_RECIEVED;
 	}
 	else if(mRemotePixmapState == PIXMAP_REQUESTED)
@@ -130,6 +131,7 @@ void MessageEndpoint::processInternalMessage(ChatMessage* m)
 	}
 	else if(mRemotePixmapState == PIXMAP_SENT && m->messageDataAsUTF8String() == PIXMAP_UPDATE_AVAILABLE_STRING)
 	{
+		cout << "[MessageEndpoint] Remote has informed us about an available pixmap update." << endl;
 		mRemotePixmapState = PIXMAP_UPDATE_AVAILABLE;
 		requestPixmap();
 	}
@@ -166,7 +168,6 @@ void MessageEndpoint::requestPixmap()
 void MessageEndpoint::sendPixmap()
 {
 	cout << "[MessageEndpoint] Sending pixmap to remote." << endl;
-
 	QByteArray pixmapArray;
 	QBuffer pixmapBuffer(&pixmapArray);
 	pixmapBuffer.open(QIODevice::WriteOnly);
@@ -177,6 +178,7 @@ void MessageEndpoint::sendPixmap()
 
 void MessageEndpoint::notifyRemoteAboutPixmapUpdate()
 {
+	cout << "[MessageEndpoint] Notifying remote about available pixmap update." << endl;
 	mLocalPixmapState = PIXMAP_UPDATE_AVAILABLE;
 	writeInternalMessageString(PIXMAP_UPDATE_AVAILABLE_STRING);
 }
