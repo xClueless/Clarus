@@ -197,7 +197,7 @@ void MessageEndpoint::handleIndentityMessage(ChatMessage* request)
 	}
 	else if(mLocalIdentState == IDENTITY_SENT)
 	{
-		if(remoteName() == IDENTIFIED_STRING)
+		if(requestString == IDENTIFIED_STRING)
 		{
 			cout << "[MessageEndpoint] Remote successfully identified is." << endl;
 			mRemoteIdentState = IDENTIFIED;
@@ -236,7 +236,6 @@ void MessageEndpoint::notifyRemoteAboutIdentityUpdate()
 void MessageEndpoint::sendIdentity()
 {
 	cout << "[MessageEndpoint] Sending identity to remote." << endl;
-
 	writeInternalMessageString(mClientManager->localName(), IDENTIFICATION);
 	mLocalIdentState = IDENTITY_SENT;
 }
