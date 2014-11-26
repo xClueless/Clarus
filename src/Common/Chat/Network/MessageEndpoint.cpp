@@ -83,7 +83,7 @@ void MessageEndpoint::readChatMessage(QByteArray messageBytes)
 
 void MessageEndpoint::writeChatMessage(ChatMessage* m)
 {
-	cout << "[MessageEndpoint] Writing message with flags: " << m->flags().flagString().toStdString() << endl;
+	cout << "[MessageEndpoint] Writing message '" << m->messageDataAsUTF8String().toStdString() << "' with flags: " << m->flags().flagString().toStdString() << endl;
 	mNetworkStream.writeMessage(m->rawMessageBytes());
 }
 

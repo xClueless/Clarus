@@ -56,7 +56,7 @@ void NetworkStream::readAvailableData()
 
 	QByteArray newData = readBytesFromSocket(mSocket, sizeDiff);
 	mMessageBuffer += newData;
-	cout << "[NetworkStream] Read " << newData.size() << " bytes of new data." << endl;
+//	cout << "[NetworkStream] Read " << newData.size() << " bytes of new data." << endl;
 }
 
 void NetworkStream::writeMessage(QString message)
