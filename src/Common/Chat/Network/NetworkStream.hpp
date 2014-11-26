@@ -13,7 +13,6 @@ private:
 	Q_OBJECT
 
 	QAbstractSocket* mSocket;
-	QTextCodec* mTextCodec;
 
 	QByteArray mMessageBuffer;
 	qint32 mMessageSize;
@@ -26,11 +25,12 @@ public:
 	explicit NetworkStream(QAbstractSocket* socket, QObject *parent = 0);
 	void hook();
 	void unhook();
-	void writeMessage(QString m);
 signals:
-	void messageReady(QString m);
+	void messageReady(QByteArray m);
 public slots:
 	void dataRecieved();
+	void writeMessage(QString m);
+	void writeMessage(QByteArray messageBytes);
 };
 
 #endif // NETWORKSTREAM_HPP

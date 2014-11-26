@@ -1,0 +1,7 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+    <file>images/audio-call.png</file>
+    <file>images/video-call.png</file>
+    <file>images/default-contact-icon.png</file>
+</qresource>
+</RCC>

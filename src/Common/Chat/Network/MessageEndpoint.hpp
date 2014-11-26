@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QString>
 #include <QTcpSocket>
+#include <QPixmap>
 #include "NetworkStream.hpp"
 #include "../ChatMessage.hpp"
 #include "../ConnectionError.hpp"
@@ -21,6 +22,14 @@ enum IdentState
 	IDENTIFICATION_COMPLETE = 6
 };
 
+enum PixmapState
+{
+	PIXMAP_NOT_SENT,
+	PIXMAP_REQUESTED,
+	PIXMAP_SENT,
+	PIXMAP_RECIEVED
+};
+
 class MessageEndpoint : public QObject
 {
 private:
@@ -33,19 +42,32 @@ protected:
 	const QString UNSPECIFIED_IDENT_ERROR_STRING = "UNSPECIFIED_IDENT_ERROR";
 	const QString REQUIRES_IDENTIFICATON_STRING = "REQUIRES_IDENTIFICATON";
 
+	const QString PIXMAP_REQUEST_STRING = "SEND_PIXMAP";
+	const QString PIXMAP_RECIEVED_STRING = "RECIEVED_PIXMAP";
+
 	ClientManager* mClientManager;
 	QString mRemoteName = "UNKNOWN_REMOTE";
 	QTcpSocket* mSocket;
 	NetworkStream mNetworkStream;
 	IdentState mIdentState = NOT_IDENTIFIED;
 
-	void writeInternalMessage(QString messageString);
+	PixmapState mLocalPixmapState;
+	PixmapState mRemotePixmapState;
+
+	QPixmap mRemotePixmap;
+
+	void writeInternalMessageString(QString messageString);
+	void writeInternalMessageBytes(QByteArray messageBytes);
+
 	QString identStateString();
 public:
 	explicit MessageEndpoint(ClientManager* clientManager, QTcpSocket* socket, QObject *parent = 0);
 	virtual ~MessageEndpoint();
+
 	QString remoteName();
 	QTcpSocket* socket();
+	QPixmap& remotePixmap();
+
 	bool operator ==(MessageEndpoint* endpoint);
 	bool operator !=(MessageEndpoint* endpoint);
 signals:
@@ -54,11 +76,15 @@ signals:
 	void remoteNameChanged();
 	void connectionFailed(ConnectionError ce);
 public slots:
-	void readChatMessage(QString messageString);
+	void readChatMessage(QByteArray messageBytes);
 	void writeChatMessage(ChatMessage* m);
 	virtual void processInternalMessage(ChatMessage* m);
 	void setRemoteName(QString name);
 	void handleSocketError(QAbstractSocket::SocketError error);
+
+	void requestPixmap();
+	void sendPixmap();
+	void recievePixmap(ChatMessage* m);
 };
 
 #endif // MESSAGEENDPOINT_HPP

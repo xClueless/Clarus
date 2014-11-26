@@ -1,6 +1,8 @@
 #include "MessageEndpoint.hpp"
+
 #include <iostream>
 #include <QHostAddress>
+#include <QBuffer>
 #include "ClientManager.hpp"
 
 using namespace std;
@@ -8,7 +10,7 @@ using namespace std;
 MessageEndpoint::MessageEndpoint(ClientManager* clientManager, QTcpSocket* socket, QObject *parent) :
 	QObject(parent), mClientManager(clientManager), mSocket(socket), mNetworkStream(mSocket)
 {
-	connect(&mNetworkStream, SIGNAL(messageReady(QString)), this, SLOT(readChatMessage(QString)));
+	connect(&mNetworkStream, SIGNAL(messageReady(QByteArray)), this, SLOT(readChatMessage(QByteArray)));
 	connect(this, SIGNAL(internalMessageReady(ChatMessage*)), this, SLOT(processInternalMessage(ChatMessage*)));
 	connect(mSocket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(handleSocketError(QAbstractSocket::SocketError)));
 }
@@ -21,11 +23,17 @@ MessageEndpoint::~MessageEndpoint()
 
 void MessageEndpoint::sendIdentError()
 {
-	writeInternalMessage("NOT_IDENTIFIED");
+	writeInternalMessageString("NOT_IDENTIFIED");
 }
-void MessageEndpoint::writeInternalMessage(QString messageString)
+void MessageEndpoint::writeInternalMessageString(QString messageString)
 {
-	ChatMessage internalMessage(MessageFlags(INTERNAL), QStringList(mRemoteName), messageString);
+	ChatMessage internalMessage(INTERNAL, QStringList(mRemoteName), messageString);
+	writeChatMessage(&internalMessage);
+}
+
+void MessageEndpoint::writeInternalMessageBytes(QByteArray messageBytes)
+{
+	ChatMessage internalMessage(INTERNAL, QStringList(mRemoteName), messageBytes);
 	writeChatMessage(&internalMessage);
 }
 
@@ -43,12 +51,12 @@ QString MessageEndpoint::identStateString()
 	}
 }
 
-void MessageEndpoint::readChatMessage(QString messageString)
+void MessageEndpoint::readChatMessage(QByteArray messageBytes)
 {
 //	cout << "[MessageEndpoint] Whole message is available. Reading it now." << endl;
 	try
 	{
-		ChatMessage* m = new ChatMessage(messageString, mRemoteName);
+		ChatMessage* m = new ChatMessage(messageBytes, mRemoteName);
 //		cout << "[MessageEndpoint] Message: " << m->messageString().toStdString() << endl;
 		if(m->flags().type() == INTERNAL)
 		{
@@ -62,7 +70,7 @@ void MessageEndpoint::readChatMessage(QString messageString)
 			}
 			else
 			{
-				cout << "[MessageEndpoint] Alerting subscribers to new message: " << m->message().toStdString() << endl;
+				cout << "[MessageEndpoint] Alerting subscribers to new message: " << m->messageAsUTF8String().toStdString() << endl;
 				emit messageReady(m);
 			}
 		}
@@ -75,7 +83,7 @@ void MessageEndpoint::readChatMessage(QString messageString)
 
 void MessageEndpoint::writeChatMessage(ChatMessage* m)
 {
-	mNetworkStream.writeMessage(m->messageString());
+	mNetworkStream.writeMessage(m->messageBytes());
 }
 
 QString MessageEndpoint::remoteName()
@@ -86,6 +94,11 @@ QString MessageEndpoint::remoteName()
 QTcpSocket* MessageEndpoint::socket()
 {
 	return mSocket;
+}
+
+QPixmap& MessageEndpoint::remotePixmap()
+{
+	return mRemotePixmap;
 }
 
 bool MessageEndpoint::operator ==(MessageEndpoint* endpoint)
@@ -100,12 +113,27 @@ bool MessageEndpoint::operator !=(MessageEndpoint* endpoint)
 
 void MessageEndpoint::processInternalMessage(ChatMessage* m)
 {
-	cerr << "[MessageEndpoint] Internal message: " << m->message().toStdString()
-		 << " not understood in current state: " << identStateString().toStdString() << endl;
-	writeInternalMessage("UNKNOWN_COMMAND");
-	while(true)
+	if(m->messageAsUTF8String() == PIXMAP_REQUEST_STRING)
 	{
+		sendPixmap();
+	}
+	else if(mLocalPixmapState == PIXMAP_SENT && m->messageAsUTF8String() == PIXMAP_RECIEVED_STRING)
+	{
+		mLocalPixmapState = PIXMAP_RECIEVED;
+	}
+	else if(mRemotePixmapState == PIXMAP_REQUESTED)
+	{
+		recievePixmap(m);
+	}
+	else
+	{
+		cerr << "[MessageEndpoint] Internal message: " << m->messageAsUTF8String().toStdString()
+			 << " not understood in current state: " << identStateString().toStdString() << endl;
+		writeInternalMessageString("UNKNOWN_COMMAND");
+		while(true)
+		{
 
+		}
 	}
 }
 
@@ -118,5 +146,31 @@ void MessageEndpoint::setRemoteName(QString name)
 void MessageEndpoint::handleSocketError(QAbstractSocket::SocketError error)
 {
 	emit connectionFailed(ConnectionError(mSocket, error));
+}
+
+void MessageEndpoint::requestPixmap()
+{
+	writeInternalMessageString(PIXMAP_REQUEST_STRING);
+	mRemotePixmapState = PIXMAP_REQUESTED;
+}
+
+void MessageEndpoint::sendPixmap()
+{
+	QByteArray pixmapArray;
+	QBuffer pixmapBuffer(&pixmapArray);
+	pixmapBuffer.open(QIODevice::ReadOnly);
+	mClientManager->localPixmap().save(&pixmapBuffer, "PNG");
+	writeInternalMessageBytes(pixmapArray);
+	mLocalPixmapState = PIXMAP_SENT;
+}
+
+void MessageEndpoint::recievePixmap(ChatMessage* m)
+{
+	if(mRemotePixmap.loadFromData(m->messageBytes(), "PNG"))
+	{
+		mRemotePixmapState = PIXMAP_RECIEVED;
+		writeInternalMessageString(PIXMAP_RECIEVED_STRING);
+	}
+	m->messageBytes();
 }
 

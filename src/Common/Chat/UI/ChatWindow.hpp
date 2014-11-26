@@ -7,13 +7,15 @@
 #include <QLineEdit>
 #include <QStringList>
 #include <QListView>
+#include <QListWidget>
 #include <QStringListModel>
+
 #include "../ChatMessage.hpp"
 #include "../Network/MessageClient.hpp"
 #include "../ChatGroup.hpp"
 #include "ConversationView.hpp"
 #include "MessageLabel.hpp"
-#include <QListWidget>
+#include "GroupHeaderWidget.hpp"
 
 class ChatWindow : public QWidget
 {
@@ -21,6 +23,8 @@ private:
 	Q_OBJECT
 
 	ChatGroup* mGroup;
+	GroupHeaderWidget* mGroupIdentityWidget;
+
 	QStringList mMessages;
 	QStringListModel mMessageModel;
 

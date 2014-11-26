@@ -2,8 +2,9 @@
 #define CHATGROUP_HPP
 
 #include <QObject>
-#include <QSet>
+#include <QList>
 #include <QStringList>
+#include <QPixmap>
 #include "Network/MessageEndpoint.hpp"
 #include "Network/ClientManager.hpp"
 
@@ -11,22 +12,29 @@ class ChatGroup : public QObject
 {
 private:
 	Q_OBJECT
+	const QString DEFAULT_GROUP_ICON_PATH = ":/images/default-contact-icon.png";
+
 	QString mGroupName;
+	QPixmap mGroupPixmap;
 	ClientManager* mClientManager;
-	QSet<MessageEndpoint*> mEndpoints;
+	QList<MessageEndpoint*> mEndpoints;
 public:
 	explicit ChatGroup(ClientManager* clientManager, MessageEndpoint* endpoint, QObject *parent = 0);
 	explicit ChatGroup(ClientManager* clientManager, QSet<MessageEndpoint*> endpoints, QObject *parent = 0);
-	QSet<MessageEndpoint*> endpoints();
+	virtual ~ChatGroup();
+	QList<MessageEndpoint*> endpoints();
 	void addEndpoint(MessageEndpoint* endpoint);
 	void removeEndpoint(MessageEndpoint* endpoint);
 	bool empty();
 	QStringList endpointRemoteNames();
 	QString groupName();
+	QPixmap& groupPixmap();
 signals:
 	void messageReady(ChatMessage* m);
 	void remoteNameChanged();
 	void groupNameChanged();
+	void endpointRemoved(MessageEndpoint* endpoint);
+	void endpointAdded(MessageEndpoint* endpoint);
 protected slots:
 	void endpointHasNewMessage(ChatMessage* m);
 	void endpointNameHasChanged();

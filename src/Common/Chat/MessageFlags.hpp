@@ -2,26 +2,41 @@
 #define MESSAGEFLAGS_HPP
 
 #include <QString>
+#include <QByteArray>
 
 enum MessageType
 {
-	INTERNAL = 0,
-	PRIVATE = 1
+	RAW,
+	INTERNAL,
+	PRIVATE
 };
 
 class MessageFlags
 {
 private:
-	QChar INTERNAL_CHAR = 'I';
-	QChar PRIVATE_CHAR = 'P';
+	static const char INTERNAL_CHAR = 'I';
+	static const char PRIVATE_CHAR = 'P';
+	static const char RAW_CHAR = 'R';
 
-	MessageType mType;
+	MessageType mType = RAW;
+	quint16 mEndpointListSize = 0;
+
+	char typeAsChar() const;
+	MessageType typeFromChar(char typeCharacter) const;
 public:
-	MessageFlags(MessageType type=INTERNAL);
-	MessageFlags(QString flagString);
-	MessageType type();
+	static const size_t FLAG_SECTION_BYTES = sizeof(char) + sizeof(mEndpointListSize);
+	MessageFlags();
+	MessageFlags(MessageType type, quint16 endpointListSize);
+	MessageFlags(QByteArray flagBytes);
+
+	MessageType type() const;
 	void setType(MessageType type);
-	QString flagString();
+
+	quint16 endpointListSize() const;
+	void setEndpointListSize(quint16 listSize);
+
+	QString flagString() const;
+	QByteArray flagBytes() const;
 };
 
 #endif // MESSAGEFLAGS_HPP

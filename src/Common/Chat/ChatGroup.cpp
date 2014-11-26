@@ -5,21 +5,26 @@
 using namespace std;
 
 ChatGroup::ChatGroup(ClientManager* clientManager, MessageEndpoint* endpoint, QObject* parent)
-	: QObject(parent), mClientManager(clientManager)
+	: QObject(parent), mClientManager(clientManager), mGroupPixmap(DEFAULT_GROUP_ICON_PATH)
 {
 	addEndpoint(endpoint);
 }
 
-ChatGroup::ChatGroup(ClientManager* clientManager, QSet<MessageEndpoint*> endpoints, QObject *parent) :
-	QObject(parent), mClientManager(clientManager)
+ChatGroup::ChatGroup(ClientManager* clientManager, QSet<MessageEndpoint*> endpoints, QObject *parent)
+	: QObject(parent), mClientManager(clientManager), mGroupPixmap(DEFAULT_GROUP_ICON_PATH)
 {
 	for(MessageEndpoint* endpoint : endpoints)
 	{
 		addEndpoint(endpoint);
+		emit endpointAdded(endpoint);
 	}
 }
 
-QSet<MessageEndpoint*> ChatGroup::endpoints()
+ChatGroup::~ChatGroup()
+{
+}
+
+QList<MessageEndpoint*> ChatGroup::endpoints()
 {
 	return mEndpoints;
 }
@@ -33,7 +38,8 @@ void ChatGroup::addEndpoint(MessageEndpoint* endpoint)
 
 void ChatGroup::removeEndpoint(MessageEndpoint* endpoint)
 {
-	mEndpoints.remove(endpoint);
+	mEndpoints.removeOne(endpoint);
+	emit endpointRemoved(endpoint);
 }
 
 bool ChatGroup::empty()
@@ -64,6 +70,15 @@ QString ChatGroup::groupName()
 	}
 }
 
+QPixmap& ChatGroup::groupPixmap()
+{
+	if(mEndpoints.size() == 1)
+	{
+		return mEndpoints.front()->remotePixmap();
+	}
+	return mGroupPixmap;
+}
+
 void ChatGroup::endpointHasNewMessage(ChatMessage* m)
 {
 	emit messageReady(m);
@@ -83,7 +98,7 @@ void ChatGroup::messageAll(QString messageString)
 {
 	if(!empty())
 	{
-		ChatMessage message(MessageFlags(PRIVATE), endpointRemoteNames(), messageString);
+		ChatMessage message(PRIVATE, endpointRemoteNames(), messageString);
 		for(MessageEndpoint* endpoint : mEndpoints)
 		{
 			endpoint->writeChatMessage(&message);

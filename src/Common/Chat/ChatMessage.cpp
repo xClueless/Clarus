@@ -1,52 +1,79 @@
 #include "ChatMessage.hpp"
 #include <stdexcept>
 #include <iostream>
+#include <QDataStream>
 
 using namespace std;
 
-ChatMessage::ChatMessage(QString rawMessage, QString sender)
+ChatMessage::ChatMessage(QByteArray messageByteArray, QString sender)
 {
-//	cout << "[ChatMessage] Parsing raw message: " << rawMessage.toStdString() << endl;
-	int messageParts = rawMessage.count(DELIMITER) + 2; //Have to account for the start and end parts.
-	if(messageParts < MINIMUM_PARTS)
+	if(messageByteArray.size() < MINIMUM_MESSAGE_BYTES)
 	{
-		QString errorString("Failed to parse chat message. Message does not contain enough parts. Has " + QString::number(messageParts) + " should have " + QString::number(MINIMUM_PARTS));
-		errorString += " Raw message: " + rawMessage;
-		throw runtime_error(errorString.toStdString());
+		throw runtime_error("Failed to parse message. It does not have the minimum number of bytes required.");
 	}
 
-	QString flagSection = rawMessage.section(DELIMITER, 0, 0);
-	mMessageFlags = MessageFlags(flagSection);
+	mMessageFlags = MessageFlags(messageByteArray.left(MessageFlags::FLAG_SECTION_BYTES));
+	messageByteArray.remove(0, MessageFlags::FLAG_SECTION_BYTES);
 
-	QString targetEndpointString = rawMessage.section(DELIMITER, 1, 1);
-
-	if(targetEndpointString.contains(LIST_DELIMITER))
+	if(messageByteArray.size() < mMessageFlags.endpointListSize())
 	{
-		mTargetEndpoints = targetEndpointString.split(LIST_DELIMITER);
+		throw runtime_error("Failed to parse message. It has a smaller number of bytes than the EndpointListSize suggests.");
+	}
+
+	QString endpointList = QString::fromUtf8(messageByteArray.left(mMessageFlags.endpointListSize()));
+	if(endpointList.contains(LIST_DELIMITER))
+	{
+		mTargetEndpoints = endpointList.split(LIST_DELIMITER);
 	}
 	else
 	{
-		mTargetEndpoints << targetEndpointString;
+		mTargetEndpoints << endpointList;
 	}
-	mMessage = rawMessage.section(DELIMITER, 2);
+	messageByteArray.remove(0, mMessageFlags.endpointListSize());
+
+	if(messageByteArray.size() <= 0)
+	{
+		throw runtime_error("Failed to parse message. Data section is empty.");
+	}
+	mMessageData = messageByteArray;
 	mSender = sender;
 }
-ChatMessage::ChatMessage(MessageFlags flags, QStringList targetEndpoints, QString message) : mMessageFlags(flags), mTargetEndpoints(targetEndpoints), mMessage(message)
+ChatMessage::ChatMessage(MessageType type, QStringList targetEndpoints, QString message)
+	: mTargetEndpoints(targetEndpoints)
 {
+	mMessageData = message.toUtf8();
+	mMessageFlags.setType(type);
 }
 
+ChatMessage::ChatMessage(MessageType type, QStringList targetEndpoints, QByteArray messageData)
+	: mTargetEndpoints(targetEndpoints), mMessageData(messageData)
+{
+	mMessageFlags.setType(type);
+}
 QStringList ChatMessage::targetEndpoints() const
 {
 	return mTargetEndpoints;
 }
-QString ChatMessage::message() const
+QString ChatMessage::messageAsUTF8String() const
 {
-	return mMessage;
+	if(mMessageFlags.type() == RAW)
+	{
+		return "RAW_MESSAGE";
+	}
+	return QString::fromUtf8(mMessageData);
 }
 
-QString ChatMessage::messageString()
+QByteArray ChatMessage::messageBytes()
 {
-	return mMessageFlags.flagString() + DELIMITER + mTargetEndpoints.join(',') + DELIMITER + mMessage;
+	QByteArray endpointListBytes = mTargetEndpoints.join(LIST_DELIMITER).toUtf8();
+	mMessageFlags.setEndpointListSize(endpointListBytes.size());
+
+	QByteArray messageByteArray;
+	messageByteArray += mMessageFlags.flagBytes();
+	messageByteArray += endpointListBytes;
+	messageByteArray += mMessageData;
+
+	return messageByteArray;
 }
 
 QString ChatMessage::sender()

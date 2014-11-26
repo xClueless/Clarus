@@ -122,6 +122,7 @@ using namespace cv;
 //		exit(-1);
 //	}
 //}
+
 void qtThread(int argc, char** argv, options opts)
 {
 	QApplication a(argc, argv);

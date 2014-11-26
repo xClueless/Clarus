@@ -8,6 +8,7 @@
 #include <stdint.h>
 #include <QString>
 #include <QMap>
+#include <QPixmap>
 #include "../ChatMessage.hpp"
 #include "MessageClient.hpp"
 #include "MessageServer.hpp"
@@ -18,11 +19,14 @@ class ClientManager : public QObject
 private:
 	Q_OBJECT
 	const QString BROADCAST_CONNECT_STRING = "CONNECT_BACK";
+	const QString DEFAULT_PIXMAP_URL = ":/images/default-contact-icon.png";
 
 	QTcpServer* mServerSocket;
 	QUdpSocket* mBroadcastSocket;
 
 	QString mLocalName;
+	QPixmap mLocalPixmap;
+
 	uint32_t mPort;
 	QList<MessageEndpoint*> mIdentifiedEndpoints;
 	QList<MessageServer*> mServersThatNeedIdentification;
@@ -33,6 +37,7 @@ public:
 	explicit ClientManager(QString name, uint32_t port, QObject *parent = 0);
 	QList<MessageEndpoint*> identifiedEndpoints();
 	QString localName();
+	QPixmap& localPixmap();
 	bool endpointIsConnected(QString remoteName);
 	bool isLocalAddress(QString remoteName);
 signals:

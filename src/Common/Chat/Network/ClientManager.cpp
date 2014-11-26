@@ -6,8 +6,8 @@
 
 using namespace std;
 
-ClientManager::ClientManager(QString name, uint32_t port, QObject *parent) :
-	QObject(parent), mLocalName(name), mPort(port)
+ClientManager::ClientManager(QString name, uint32_t port, QObject* parent) :
+	QObject(parent), mLocalName(name), mPort(port), mLocalPixmap(DEFAULT_PIXMAP_URL)
 {
 	mServerSocket = new QTcpServer(this);
 	connect(mServerSocket, SIGNAL(newConnection()), this, SLOT(newClientConnected()));
@@ -21,6 +21,11 @@ ClientManager::ClientManager(QString name, uint32_t port, QObject *parent) :
 QString ClientManager::localName()
 {
 	return mLocalName;
+}
+
+QPixmap& ClientManager::localPixmap()
+{
+	return mLocalPixmap;
 }
 
 bool ClientManager::endpointIsConnected(QString remoteName)
@@ -72,6 +77,7 @@ QList<MessageEndpoint*> ClientManager::identifiedEndpoints()
 void ClientManager::addEnpointAsIdentified(MessageEndpoint* endpoint)
 {
 	mIdentifiedEndpoints << endpoint;
+	endpoint->requestPixmap();
 	emit endpointIdentified(endpoint);
 }
 void ClientManager::serverIdentifiedUs()

@@ -17,7 +17,7 @@ void MessageClient::connectToServer(QString clientHostname, quint16 mPort)
 
 void MessageClient::sendName()
 {
-	writeInternalMessage(mClientManager->localName());
+	writeInternalMessageString(mClientManager->localName());
 	mIdentState = CLIENT_IDENTITY_SENT;
 }
 
@@ -41,30 +41,30 @@ void MessageClient::handleIdentityMessage(ChatMessage* request)
 {
 	if(mIdentState == NOT_IDENTIFIED)
 	{
-		if(request->message() == IDENTITY_REQUEST_STRING)
+		if(request->messageAsUTF8String() == IDENTITY_REQUEST_STRING)
 		{
 			mIdentState = CLIENT_IDENTITY_REQUESTED;
 			sendName();
 		}
 		else
 		{
-			cerr << "[MessageClient] Server sent us an unexpected message '" << request->message().toStdString()
+			cerr << "[MessageClient] Server sent us an unexpected message '" << request->messageAsUTF8String().toStdString()
 				 << "' for state " << identStateString().toStdString() << endl;
-			writeInternalMessage("NOT_YET_IDENTIFIED");
+			writeInternalMessageString("NOT_YET_IDENTIFIED");
 		}
 	}
 	else if(mIdentState == CLIENT_IDENTITY_SENT)
 	{
-		if(request->message() == SENT_EMPTY_NAME_STRING)
+		if(request->messageAsUTF8String() == SENT_EMPTY_NAME_STRING)
 		{
 			mIdentState = NOT_IDENTIFIED;
 			emit identificationFailed(ConnectionError(IDENT_SENT_EMPTY_NAME));
 		}
-		else if(request->message() == IDENTIFIED_STRING)
+		else if(request->messageAsUTF8String() == IDENTIFIED_STRING)
 		{
 			cout << "[MessageClient] Server sent us confirmation of our identification." << endl;
 			cout << "[MessageClient] Asking server for its identification." << endl;
-			writeInternalMessage(IDENTITY_REQUEST_STRING);
+			writeInternalMessageString(IDENTITY_REQUEST_STRING);
 			mIdentState = SERVER_IDENTITY_REQUESTED;
 		}
 		else
@@ -85,10 +85,10 @@ void MessageClient::handleIdentityMessage(ChatMessage* request)
 
 void MessageClient::identityRecieved(ChatMessage* m)
 {
-	QString serverName = m->message();
+	QString serverName = m->messageAsUTF8String();
 	if(serverName.isEmpty())
 	{
-		writeInternalMessage(SENT_EMPTY_NAME_STRING);
+		writeInternalMessageString(SENT_EMPTY_NAME_STRING);
 		cerr << "Remote host " + mSocket->localAddress().toString().toStdString()
 							+ " violated IDENTIFY protocol. They sent back an empty name.";
 		mIdentState = NOT_IDENTIFIED;
@@ -97,7 +97,7 @@ void MessageClient::identityRecieved(ChatMessage* m)
 	else
 	{
 		setRemoteName(serverName);
-		writeInternalMessage(IDENTIFIED_STRING);
+		writeInternalMessageString(IDENTIFIED_STRING);
 		mIdentState = IDENTIFICATION_COMPLETE;
 
 		cout << "[MessageClient] Server identified successfully with name: " << mRemoteName.toStdString() << endl;

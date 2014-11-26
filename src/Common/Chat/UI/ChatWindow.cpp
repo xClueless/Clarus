@@ -11,6 +11,9 @@ ChatWindow::ChatWindow(ChatGroup* group, QWidget *parent) :
 	mLayout = new QVBoxLayout(this);
 	this->setLayout(mLayout);
 
+	mGroupIdentityWidget = new GroupHeaderWidget(mGroup, this);
+	mLayout->addWidget(mGroupIdentityWidget);
+
 //	mMessageModel.setStringList(mMessages);
 //	mConversationView.setModel(&mMessageModel);
 //	mLayout->addWidget(&mConversationView);
@@ -32,15 +35,15 @@ ChatGroup* ChatWindow::group()
 
 void ChatWindow::messageReadyToSend()
 {
-	ChatMessage message(MessageFlags(PRIVATE), mGroup->endpointRemoteNames(), mInputBox->text());
+	ChatMessage message(PRIVATE, mGroup->endpointRemoteNames(), mInputBox->text());
 	mGroup->messageAll(&message);
-	addMessageBox("Me:" + message.messageString());
+	addMessageBox("Me:" + message.messageBytes());
 	mInputBox->clear();
 }
 
 void ChatWindow::displayMessage(ChatMessage* m)
 {
-	addMessageBox(m->sender() + ":" + m->messageString());
+	addMessageBox(m->sender() + ":" + m->messageBytes());
 
 	QApplication::alert(this, 300);
 //	mMessageModel.setStringList(mMessages);
@@ -54,7 +57,8 @@ void ChatWindow::addMessageBox(QString messageDisplayString)
 	QString sender = messageDisplayString.section(':', 0, 0);
 	QString messageString = messageDisplayString.section(':', 1);
 
-	ChatMessage* newMessage = new ChatMessage(messageString, sender);
+	ChatMessage* newMessage = new ChatMessage(PRIVATE, QStringList("DISPLAY_ONLY"), messageString);
+	newMessage->setSender(sender);
 	MessageLabel* widget = new MessageLabel(newMessage);
 
 	mMessageListWidget.addItem(listWidgetItem);

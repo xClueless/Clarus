@@ -10,7 +10,6 @@ using namespace std;
 NetworkStream::NetworkStream(QAbstractSocket* socket, QObject *parent) :
 	QObject(parent), mSocket(socket)
 {
-	mTextCodec = QTextCodec::codecForName("UTF-8");
 	hook();
 }
 
@@ -62,9 +61,14 @@ void NetworkStream::readAvailableData()
 
 void NetworkStream::writeMessage(QString message)
 {
-	QByteArray messageArray = message.toUtf8();
-	qint32 messageSize = messageArray.size();
-//	cout << "[NetworkStream] WRITE-MESSAGE '" << message.toStdString() << "' SIZE: " << messageSize << endl;
+	QByteArray messageBytes = message.toUtf8();
+	//	cout << "[NetworkStream] WRITE-MESSAGE '" << message.toStdString() << "' SIZE: " << messageSize << endl;
+	writeMessage(messageBytes);
+}
+
+void NetworkStream::writeMessage(QByteArray messageBytes)
+{
+	qint32 messageSize = messageBytes.size();
 
 	QByteArray sizeArray;
 	QDataStream byteStream(&sizeArray, QIODevice::WriteOnly);
@@ -73,8 +77,8 @@ void NetworkStream::writeMessage(QString message)
 	mSocket->write(sizeArray);
 //	cout << "[NetworkStream] Sent message size." << endl;
 
-	mSocket->write(messageArray);
-//	cout << "[NetworkStream] Sent message data." << endl;
+	mSocket->write(messageBytes);
+	//	cout << "[NetworkStream] Sent message data." << endl;
 }
 
 void NetworkStream::dataRecieved()
@@ -101,10 +105,9 @@ void NetworkStream::dataRecieved()
 			{
 				//The message is ready.
 				mProcessingMessage = false;
-				QString message = mTextCodec->toUnicode(mMessageBuffer);
+				emit messageReady(mMessageBuffer);
 				mMessageBuffer.clear();
 //				cout << "[NetworkStream] READ-MESSAGE '" << message.toStdString() << endl;
-				emit messageReady(message);
 			}
 			if(mSocket->bytesAvailable() > 0) //There may be residual bytes from a new message.
 			{

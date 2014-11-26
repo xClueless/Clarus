@@ -3,6 +3,12 @@ SET(CMAKE_AUTOMOC ON)
 
 project("Clarus")
 INCLUDE(../clews/Clews.cmake)
+
+find_package(Qt5Core REQUIRED)
+find_package(Qt5Widgets REQUIRED)
+find_package(Qt5Network REQUIRED)
+
+clews_add_qt_resources()
 clews_add_executable()
 
 find_library(SOCK_LIBRARY NAMES sock libsock HINTS ${CMAKE_CURRENT_LIST_DIR}/lib /usr/local/lib/clews)
@@ -30,10 +36,6 @@ MESSAGE(STATUS "OPENCV_IMGCODECS_LIBRARY ${OPENCV_IMGCODECS_LIBRARY}")
 clews_target_link_libraries(${OPENCV_VIDEOIO_LIBRARY})
 clews_target_link_libraries(${OPENCV_IMGCODECS_LIBRARY})
 ENDIF()
-
-find_package(Qt5Core REQUIRED)
-find_package(Qt5Widgets REQUIRED)
-find_package(Qt5Network REQUIRED)
 
 clews_target_link_libraries(Qt5::Core)
 clews_target_link_libraries(Qt5::Widgets)
