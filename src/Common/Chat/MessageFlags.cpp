@@ -21,10 +21,9 @@ MessageFlags::MessageFlags(QByteArray flagBytes)
 	}
 	QDataStream flagByteStream(flagBytes);
 
-	char typeChar;
-	flagByteStream.readRawData(&typeChar, 1);
+	QChar typeChar;
+	flagByteStream >> typeChar;
 	mType = typeFromChar(typeChar);
-
 	flagByteStream >> mEndpointListSize;
 }
 
@@ -48,7 +47,7 @@ void MessageFlags::setEndpointListSize(quint16 listSize)
 	mEndpointListSize = listSize;
 }
 
-char MessageFlags::typeAsChar() const
+QChar MessageFlags::typeAsChar() const
 {
 	switch(mType)
 	{
@@ -59,15 +58,12 @@ char MessageFlags::typeAsChar() const
 	}
 }
 
-MessageType MessageFlags::typeFromChar(char typeCharacter) const
+MessageType MessageFlags::typeFromChar(QChar typeCharacter) const
 {
-	switch(typeCharacter)
-	{
-		case INTERNAL_CHAR: return INTERNAL;
-		case PRIVATE_CHAR: return PRIVATE;
-		case RAW_CHAR: return RAW;
-		default: throw runtime_error("Unknown type flag: " + typeCharacter);
-	}
+	if(typeCharacter == INTERNAL_CHAR) return INTERNAL;
+	if(typeCharacter == PRIVATE_CHAR) return PRIVATE;
+	if(typeCharacter == RAW_CHAR) return RAW;
+	throw runtime_error("Unknown type flag: " + typeCharacter.toLatin1());
 }
 
 QString MessageFlags::flagString() const

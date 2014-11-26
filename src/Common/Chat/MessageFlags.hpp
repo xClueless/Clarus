@@ -14,17 +14,17 @@ enum MessageType
 class MessageFlags
 {
 private:
-	static const char RAW_CHAR = 'R';
-	static const char INTERNAL_CHAR = 'I';
-	static const char PRIVATE_CHAR = 'P';
+	QChar RAW_CHAR = 'R';
+	QChar INTERNAL_CHAR = 'I';
+	QChar PRIVATE_CHAR = 'P';
 
 	MessageType mType = RAW;
 	quint16 mEndpointListSize = 0;
 
-	char typeAsChar() const;
-	MessageType typeFromChar(char typeCharacter) const;
+	QChar typeAsChar() const;
+	MessageType typeFromChar(QChar typeCharacter) const;
 public:
-	static const size_t FLAG_SECTION_BYTES = sizeof(char) + sizeof(mEndpointListSize);
+	static const size_t FLAG_SECTION_BYTES = 2 + sizeof(mEndpointListSize); //Depending on QChar being two bytes long is probably bad.
 	MessageFlags();
 	MessageFlags(MessageType type, quint16 endpointListSize);
 	MessageFlags(QByteArray flagBytes);
