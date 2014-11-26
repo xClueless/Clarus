@@ -115,6 +115,8 @@ bool MessageEndpoint::operator !=(MessageEndpoint* endpoint)
 
 void MessageEndpoint::processInternalMessage(ChatMessage* m)
 {
+	cout << "[MessageEndpoint] Processing internal message: " << m->messageDataAsUTF8String().toStdString() << endl;
+
 	if((mLocalPixmapState == PIXMAP_NOT_SENT || mLocalPixmapState == PIXMAP_UPDATE_AVAILABLE)
 			&& m->messageDataAsUTF8String() == PIXMAP_REQUEST_STRING)
 	{
