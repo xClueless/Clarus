@@ -5,6 +5,7 @@
 #include <QBoxLayout>
 #include <QLabel>
 #include <QLineEdit>
+#include <QPushButton>
 #include "../Network/ClientManager.hpp"
 
 class LocalIdentityWidget : public QWidget
@@ -13,6 +14,7 @@ private:
 	Q_OBJECT
 	ClientManager* mClientManager;
 	QHBoxLayout* mLayout;
+	QPushButton* mLocalPixmapButton;
 	QLabel* mLocalNameLabel;
 	QLineEdit* mLocalNameBox;
 public:
@@ -23,6 +25,8 @@ signals:
 public slots:
 	void sendNewLocalName();
 	void retrieveNewLocalName();
+	void selectNewPixmap();
+	void updatePixmap();
 };
 
 #endif // LOCALIDENTITYWIDGET_HPP

@@ -173,6 +173,18 @@ void ClientManager::setLocalName(QString name)
 	emit localNameChanged();
 }
 
+void ClientManager::loadLocalPixmap(QString pixmapURL)
+{
+	if(mLocalPixmap.load(pixmapURL, "PNG"))
+	{
+		emit localPixmapChanged();
+	}
+	else
+	{
+		mLocalPixmap.load(DEFAULT_PIXMAP_URL);
+	}
+}
+
 void ClientManager::sendBroadcast()
 {
 	cout << "[ClientManager] Sending out broadcast for local clients." << endl;

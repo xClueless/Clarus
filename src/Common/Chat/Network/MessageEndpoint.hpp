@@ -27,7 +27,8 @@ enum PixmapState
 	PIXMAP_NOT_SENT,
 	PIXMAP_REQUESTED,
 	PIXMAP_SENT,
-	PIXMAP_RECIEVED
+	PIXMAP_RECIEVED,
+	PIXMAP_UPDATE_AVAILABLE,
 };
 
 class MessageEndpoint : public QObject
@@ -44,6 +45,7 @@ protected:
 
 	const QString PIXMAP_REQUEST_STRING = "SEND_PIXMAP";
 	const QString PIXMAP_RECIEVED_STRING = "RECIEVED_PIXMAP";
+	const QString PIXMAP_UPDATE_AVAILABLE_STRING = "PIXMAP_UPDATE_AVAILABLE";
 
 	ClientManager* mClientManager;
 	QString mRemoteName = "UNKNOWN_REMOTE";
@@ -75,6 +77,7 @@ signals:
 	void internalMessageReady(ChatMessage* m);
 	void remoteNameChanged();
 	void connectionFailed(ConnectionError ce);
+	void remotePixmapChanged();
 public slots:
 	void readChatMessage(QByteArray messageBytes);
 	void writeChatMessage(ChatMessage* m);
@@ -84,6 +87,7 @@ public slots:
 
 	void requestPixmap();
 	void sendPixmap();
+	void notifyRemoteAboutPixmapUpdate();
 	void recievePixmap(ChatMessage* m);
 };
 

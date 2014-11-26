@@ -12,6 +12,7 @@ GroupHeaderWidget::GroupHeaderWidget(ChatGroup* group, QWidget* parent)
 	mGroupEndpointsLabel = new QLabel(mGroup->endpointRemoteNames().join(','));
 
 	connect(mGroup, SIGNAL(groupNameChanged()), this, SLOT(updateGroupNameLabel()));
+	connect(mGroup, SIGNAL(groupPixmapChanged()), this, SLOT(updateGroupIcon()));
 	connect(mGroup, SIGNAL(endpointAdded(MessageEndpoint*)), this, SLOT(handleEndpointAddtion(MessageEndpoint*)));
 	connect(mGroup, SIGNAL(endpointRemoved(MessageEndpoint*)), this, SLOT(handleEndpointRemoval(MessageEndpoint*)));
 }
@@ -31,9 +32,9 @@ void GroupHeaderWidget::createHeaderBox()
 	mHeaderBox = new QGroupBox(this);
 	QHBoxLayout* headerBoxLayout = new QHBoxLayout;
 
-	mGroupIconLabel = new QLabel(mHeaderBox);
-	mGroupIconLabel->setPixmap(mGroup->groupPixmap());
-	headerBoxLayout->addWidget(mGroupIconLabel);
+	mGroupIconButton = new QPushButton(mHeaderBox);
+	updateGroupIcon();
+	headerBoxLayout->addWidget(mGroupIconButton);
 
 	mGroupNameLabel = new QLabel(mGroup->groupName(), mHeaderBox);
 	headerBoxLayout->addWidget(mGroupNameLabel);
@@ -64,6 +65,11 @@ void GroupHeaderWidget::handleEndpointAddtion(MessageEndpoint* endpoint)
 void GroupHeaderWidget::handleEndpointRemoval(MessageEndpoint* endpoint)
 {
 	updateEndpointsLabel();
+}
+
+void GroupHeaderWidget::updateGroupIcon()
+{
+	mGroupIconButton->setIcon(QIcon(mGroup->groupPixmap()));
 }
 
 void GroupHeaderWidget::addEndpoint()

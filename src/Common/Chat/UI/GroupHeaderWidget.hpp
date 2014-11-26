@@ -18,7 +18,7 @@ private:
 	QFormLayout* mLayout;
 
 	QGroupBox* mHeaderBox;
-	QLabel* mGroupIconLabel;
+	QPushButton* mGroupIconButton;
 
 	QLabel* mGroupNameLabel;
 
@@ -39,12 +39,13 @@ public:
 	explicit GroupHeaderWidget(ChatGroup* group, QWidget *parent = 0);
 
 signals:
-
+	void groupIconChanged();
 public slots:
 	void updateGroupNameLabel();
 	void updateEndpointsLabel();
 	void handleEndpointAddtion(MessageEndpoint* endpoint);
 	void handleEndpointRemoval(MessageEndpoint* endpoint);
+	void updateGroupIcon();
 	void addEndpoint();
 };
 

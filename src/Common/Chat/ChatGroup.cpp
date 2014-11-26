@@ -34,6 +34,7 @@ void ChatGroup::addEndpoint(MessageEndpoint* endpoint)
 	mEndpoints << endpoint;
 	connect(endpoint, SIGNAL(messageReady(ChatMessage*)), this, SLOT(endpointHasNewMessage(ChatMessage*)));
 	connect(endpoint, SIGNAL(remoteNameChanged()), this, SLOT(endpointNameHasChanged()));
+	connect(endpoint, SIGNAL(remotePixmapChanged()), this, SLOT(endpointPixmapHasChanged()));
 }
 
 void ChatGroup::removeEndpoint(MessageEndpoint* endpoint)
@@ -94,6 +95,14 @@ void ChatGroup::endpointNameHasChanged()
 	}
 }
 
+void ChatGroup::endpointPixmapHasChanged()
+{
+	if(mEndpoints.size() == 1)
+	{
+		setGroupPixmap(mEndpoints.front()->remotePixmap());
+	}
+}
+
 void ChatGroup::messageAll(QString messageString)
 {
 	if(!empty())
@@ -120,5 +129,11 @@ void ChatGroup::messageAll(ChatMessage* message)
 void ChatGroup::setGroupName(QString name)
 {
 	mGroupName = name;
+}
+
+void ChatGroup::setGroupPixmap(QPixmap pixmap)
+{
+	mGroupPixmap = pixmap;
+	emit groupPixmapChanged();
 }
 

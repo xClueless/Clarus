@@ -13,6 +13,7 @@ MessageEndpoint::MessageEndpoint(ClientManager* clientManager, QTcpSocket* socke
 	connect(&mNetworkStream, SIGNAL(messageReady(QByteArray)), this, SLOT(readChatMessage(QByteArray)));
 	connect(this, SIGNAL(internalMessageReady(ChatMessage*)), this, SLOT(processInternalMessage(ChatMessage*)));
 	connect(mSocket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(handleSocketError(QAbstractSocket::SocketError)));
+	connect(mClientManager, SIGNAL(localPixmapChanged()), this, SLOT(notifyRemoteAboutPixmapUpdate()));
 }
 
 MessageEndpoint::~MessageEndpoint()
@@ -114,7 +115,8 @@ bool MessageEndpoint::operator !=(MessageEndpoint* endpoint)
 
 void MessageEndpoint::processInternalMessage(ChatMessage* m)
 {
-	if(m->messageDataAsUTF8String() == PIXMAP_REQUEST_STRING)
+	if((mLocalPixmapState == PIXMAP_NOT_SENT || mLocalPixmapState == PIXMAP_UPDATE_AVAILABLE)
+			&& m->messageDataAsUTF8String() == PIXMAP_REQUEST_STRING)
 	{
 		sendPixmap();
 	}
@@ -125,6 +127,11 @@ void MessageEndpoint::processInternalMessage(ChatMessage* m)
 	else if(mRemotePixmapState == PIXMAP_REQUESTED)
 	{
 		recievePixmap(m);
+	}
+	else if(mRemotePixmapState == PIXMAP_SENT && m->messageDataAsUTF8String() == PIXMAP_UPDATE_AVAILABLE_STRING)
+	{
+		mRemotePixmapState = PIXMAP_UPDATE_AVAILABLE;
+		requestPixmap();
 	}
 	else
 	{
@@ -168,6 +175,12 @@ void MessageEndpoint::sendPixmap()
 	mLocalPixmapState = PIXMAP_SENT;
 }
 
+void MessageEndpoint::notifyRemoteAboutPixmapUpdate()
+{
+	mLocalPixmapState = PIXMAP_UPDATE_AVAILABLE;
+	writeInternalMessageString(PIXMAP_UPDATE_AVAILABLE_STRING);
+}
+
 void MessageEndpoint::recievePixmap(ChatMessage* m)
 {
 	cout << "[MessageEndpoint] Recieved pixmap from remote." << endl;
@@ -176,6 +189,7 @@ void MessageEndpoint::recievePixmap(ChatMessage* m)
 	{
 		mRemotePixmapState = PIXMAP_RECIEVED;
 		writeInternalMessageString(PIXMAP_RECIEVED_STRING);
+		emit remotePixmapChanged();
 	}
 	else
 	{

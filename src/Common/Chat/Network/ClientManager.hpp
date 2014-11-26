@@ -36,14 +36,17 @@ private:
 public:
 	explicit ClientManager(QString name, uint32_t port, QObject *parent = 0);
 	QList<MessageEndpoint*> identifiedEndpoints();
-	QString localName();
-	QPixmap& localPixmap();
 	bool endpointIsConnected(QString remoteName);
 	bool isLocalAddress(QString remoteName);
+
+	QString localName();
+	QPixmap& localPixmap();
+
 signals:
 	void endpointIdentified(MessageEndpoint* endpoint);
 	void failedToConnectToEndpoint(MessageEndpoint* endpoint, ConnectionError connectionError);
 	void localNameChanged();
+	void localPixmapChanged();
 protected slots:
 	void serverIdentifiedUs();
 	void serverFailedToIdentifyUs(ConnectionError connectionError);
@@ -54,6 +57,7 @@ public slots:
 	void newClientConnected();
 	void connectToServer(QString serverHostname);
 	void setLocalName(QString name);
+	void loadLocalPixmap(QString pixmapURL);
 	void sendBroadcast();
 	void processDatagrams();
 };

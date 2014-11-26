@@ -33,15 +33,18 @@ signals:
 	void messageReady(ChatMessage* m);
 	void remoteNameChanged();
 	void groupNameChanged();
+	void groupPixmapChanged();
 	void endpointRemoved(MessageEndpoint* endpoint);
 	void endpointAdded(MessageEndpoint* endpoint);
 protected slots:
 	void endpointHasNewMessage(ChatMessage* m);
 	void endpointNameHasChanged();
+	void endpointPixmapHasChanged();
 public slots:
 	void messageAll(QString messageString);
 	void messageAll(ChatMessage* message);
 	void setGroupName(QString name);
+	void setGroupPixmap(QPixmap pixmap);
 };
 
 #endif // CHATGROUP_HPP
