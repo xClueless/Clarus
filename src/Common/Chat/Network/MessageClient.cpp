@@ -17,6 +17,7 @@ MessageClient::MessageClient(ClientManager* clientManager, QTcpSocket* socket, Q
 
 void MessageClient::connectToServer(QString clientHostname, quint16 mPort)
 {
+	cout << "[MessageClient] Connecting to server: " << clientHostname.toStdString() << endl;
 	mSocket->connectToHost(clientHostname, mPort, QIODevice::ReadWrite);
 }
 
