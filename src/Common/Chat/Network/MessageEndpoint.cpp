@@ -37,7 +37,6 @@ void MessageEndpoint::writeInternalMessageBytes(QByteArray messageBytes, Message
 	writeChatMessage(&internalMessage);
 }
 
-
 QString MessageEndpoint::identStateString()
 {
 	switch(mIdentState)
@@ -50,6 +49,29 @@ QString MessageEndpoint::identStateString()
 		case IDENTIFICATION_COMPLETE: return "IDENTIFICATION_COMPLETE";
 		default: return "UNKNOWN_IDENTITY_STATE";
 	}
+}
+QString MessageEndpoint::pixmapStateString()
+{
+
+	QString pixmapStateString = "Local: ";
+	switch(mLocalPixmapState)
+	{
+		case PIXMAP_NOT_SENT: pixmapStateString += "PIXMAP_NOT_SENT"; break;
+		case PIXMAP_REQUESTED: pixmapStateString += "PIXMAP_REQUESTED"; break;
+		case PIXMAP_RECIEVED: pixmapStateString += "PIXMAP_RECIEVED"; break;
+		case PIXMAP_UPDATE_AVAILABLE: pixmapStateString += "PIXMAP_UPDATE_AVAILABLE"; break;
+		default: pixmapStateString += "UNKNOWN_PIXMAP_STATE";
+	}
+	pixmapStateString += " Remote: ";
+	switch(mRemotePixmapState)
+	{
+		case PIXMAP_NOT_SENT: pixmapStateString += "PIXMAP_NOT_SENT"; break;
+		case PIXMAP_REQUESTED: pixmapStateString += "PIXMAP_REQUESTED"; break;
+		case PIXMAP_RECIEVED: pixmapStateString += "PIXMAP_RECIEVED"; break;
+		case PIXMAP_UPDATE_AVAILABLE: pixmapStateString += "PIXMAP_UPDATE_AVAILABLE"; break;
+		default: pixmapStateString += "UNKNOWN_PIXMAP_STATE";
+	}
+	return pixmapStateString;
 }
 
 void MessageEndpoint::readChatMessage(QByteArray messageBytes)
@@ -117,27 +139,10 @@ void MessageEndpoint::processInternalMessage(ChatMessage* m)
 {
 	cout << "[MessageEndpoint] Processing internal message: " << m->messageDataAsUTF8String().toStdString() << endl;
 
-	if((mLocalPixmapState == PIXMAP_NOT_SENT || mLocalPixmapState == PIXMAP_UPDATE_AVAILABLE)
-			&& m->messageDataAsUTF8String() == PIXMAP_REQUEST_STRING)
+	//This isn't the best way to handle this.
+	if(m->messageDataAsUTF8String().contains("PIXMAP"))
 	{
-		sendPixmap();
-	}
-	else if(mLocalPixmapState == PIXMAP_SENT && m->messageDataAsUTF8String() == PIXMAP_RECIEVED_STRING)
-	{
-		cout << "[MessageEndpoint] Remote has recieved our pixmap." << endl;
-		mLocalPixmapState = PIXMAP_RECIEVED;
-	}
-	else if(mRemotePixmapState == PIXMAP_REQUESTED && m->flags().format() == RAW)
-	{
-		//Us: SEND_PIXMAP
-		//Remote: ${RAWPIXMAP}
-		recievePixmap(m);
-	}
-	else if(mRemotePixmapState == PIXMAP_SENT && m->messageDataAsUTF8String() == PIXMAP_UPDATE_AVAILABLE_STRING)
-	{
-		cout << "[MessageEndpoint] Remote has informed us about an available pixmap update." << endl;
-		mRemotePixmapState = PIXMAP_UPDATE_AVAILABLE;
-		requestPixmap();
+		handlePixmapMessage(m);
 	}
 	else
 	{
@@ -160,6 +165,38 @@ void MessageEndpoint::setRemoteName(QString name)
 void MessageEndpoint::handleSocketError(QAbstractSocket::SocketError error)
 {
 	emit connectionFailed(ConnectionError(mSocket, error));
+}
+
+void MessageEndpoint::handlePixmapMessage(ChatMessage* pixmapMessage)
+{
+	QString messageUTF8 = pixmapMessage->messageDataAsUTF8String();
+	if((mLocalPixmapState == PIXMAP_NOT_SENT || mLocalPixmapState == PIXMAP_UPDATE_AVAILABLE)
+			&& messageUTF8 == PIXMAP_REQUEST_STRING)
+	{
+		sendPixmap();
+	}
+	else if(mLocalPixmapState == PIXMAP_SENT && messageUTF8 == PIXMAP_RECIEVED_STRING)
+	{
+		cout << "[MessageEndpoint] Remote has recieved our pixmap." << endl;
+		mLocalPixmapState = PIXMAP_RECIEVED;
+	}
+	else if(mRemotePixmapState == PIXMAP_REQUESTED && pixmapMessage->flags().format() == RAW)
+	{
+		//Us: SEND_PIXMAP
+		//Remote: ${RAWPIXMAP}
+		recievePixmap(pixmapMessage);
+	}
+	else if(mRemotePixmapState == PIXMAP_SENT && messageUTF8 == PIXMAP_UPDATE_AVAILABLE_STRING)
+	{
+		cout << "[MessageEndpoint] Remote has informed us about an available pixmap update." << endl;
+		mRemotePixmapState = PIXMAP_UPDATE_AVAILABLE;
+		requestPixmap();
+	}
+	else
+	{
+		cerr << "[MessageEndpoint] Pixmap message: " << messageUTF8.toStdString()
+			 << " not understood in current state: " << pixmapStateString().toStdString() << endl;
+	}
 }
 
 void MessageEndpoint::requestPixmap()

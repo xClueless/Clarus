@@ -60,8 +60,10 @@ protected:
 
 	void writeInternalMessageString(QString messageString);
 	void writeInternalMessageBytes(QByteArray messageBytes, MessageFormat format);
+	void handlePixmapMessage(ChatMessage* pixmapMessage);
 
 	QString identStateString();
+	QString pixmapStateString();
 public:
 	explicit MessageEndpoint(ClientManager* clientManager, QTcpSocket* socket, QObject *parent = 0);
 	virtual ~MessageEndpoint();
