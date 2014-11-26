@@ -11,8 +11,8 @@ MessageEndpoint::MessageEndpoint(ClientManager* clientManager, QTcpSocket* socke
 	QObject(parent), mClientManager(clientManager), mSocket(socket), mNetworkStream(mSocket)
 {
 	connect(&mNetworkStream, SIGNAL(messageReady(QByteArray)), this, SLOT(readChatMessage(QByteArray)));
-	connect(this, SIGNAL(internalMessageReady(ChatMessage*)), this, SLOT(processInternalMessage(ChatMessage*)));
 	connect(mSocket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(handleSocketError(QAbstractSocket::SocketError)));
+	connect(mClientManager, SIGNAL(localNameChanged()), this, SLOT(notifyRemoteAboutIdentityUpdate()));
 	connect(mClientManager, SIGNAL(localPixmapChanged()), this, SLOT(notifyRemoteAboutPixmapUpdate()));
 }
 
@@ -37,22 +37,30 @@ void MessageEndpoint::writeInternalMessageBytes(QByteArray messageBytes, Message
 	writeChatMessage(&internalMessage);
 }
 
-QString MessageEndpoint::identStateString()
+QString MessageEndpoint::identityStateString()
 {
-	switch(mIdentState)
+	QString identityStateString = "Local: ";
+	switch(mLocalIdentState)
 	{
-		case NOT_IDENTIFIED: return "NOT_IDENTIFIED";
-		case CLIENT_IDENTITY_REQUESTED: return "CLIENT_IDENTITY_REQUESTED";
-		case SERVER_IDENTITY_REQUESTED: return "SERVER_IDENTITY_REQUESTED";
-		case CLIENT_IDENTITY_SENT: return "CLIENT_IDENTITY_SENT";
-		case SERVER_IDENTITY_SENT: return "SERVER_IDENTITY_SENT";
-		case IDENTIFICATION_COMPLETE: return "IDENTIFICATION_COMPLETE";
-		default: return "UNKNOWN_IDENTITY_STATE";
+		case NOT_IDENTIFIED: identityStateString += "NOT_IDENTIFIED"; break;
+		case IDENTITY_REQUESTED: identityStateString += "IDENTITY_REQUESTED"; break;
+		case IDENTITY_SENT: identityStateString += "IDENTITY_SENT"; break;
+		case IDENTIFIED: identityStateString += "IDENTIFIED"; break;
+		default: identityStateString += "UNKNOWN_IDENTITY_STATE";
 	}
+	identityStateString += " Remote: ";
+	switch(mRemoteIdentState)
+	{
+		case NOT_IDENTIFIED: identityStateString += "NOT_IDENTIFIED"; break;
+		case IDENTITY_REQUESTED: identityStateString += "IDENTITY_REQUESTED"; break;
+		case IDENTITY_SENT: identityStateString += "IDENTITY_SENT"; break;
+		case IDENTIFIED: identityStateString += "IDENTIFIED"; break;
+		default: identityStateString += "UNKNOWN_IDENTITY_STATE";
+	}
+	return identityStateString;
 }
 QString MessageEndpoint::pixmapStateString()
 {
-
 	QString pixmapStateString = "Local: ";
 	switch(mLocalPixmapState)
 	{
@@ -83,11 +91,11 @@ void MessageEndpoint::readChatMessage(QByteArray messageBytes)
 //		cout << "[MessageEndpoint] Message: " << m->messageString().toStdString() << endl;
 		if(m->flags().type() != PRIVATE)
 		{
-			emit internalMessageReady(m);
+			handleInternalMessage(m);
 		}
 		else
 		{
-			if(mIdentState != IDENTIFICATION_COMPLETE)
+			if(mLocalIdentState != IDENTIFIED || mRemoteIdentState != IDENTIFIED)
 			{
 				sendIdentError();
 			}
@@ -135,27 +143,6 @@ bool MessageEndpoint::operator !=(MessageEndpoint* endpoint)
 	return !(this==endpoint);
 }
 
-void MessageEndpoint::processInternalMessage(ChatMessage* m)
-{
-	cout << "[MessageEndpoint] Processing internal message: " << m->messageDataAsUTF8String().toStdString() << endl;
-
-	//This isn't the best way to handle this.
-	if(m->flags().type() == ENDPOINT_PIXMAP_EXCHANGE)
-	{
-		handlePixmapMessage(m);
-	}
-	else
-	{
-		cerr << "[MessageEndpoint] Internal message: " << m->messageDataAsUTF8String().toStdString()
-			 << " not understood in current state: " << identStateString().toStdString() << endl;
-		writeInternalMessageString("UNKNOWN_COMMAND", PROTOCOL_ERROR);
-		while(true)
-		{
-
-		}
-	}
-}
-
 void MessageEndpoint::setRemoteName(QString name)
 {
 	mRemoteName = name;
@@ -167,7 +154,113 @@ void MessageEndpoint::handleSocketError(QAbstractSocket::SocketError error)
 	emit connectionFailed(ConnectionError(mSocket, error));
 }
 
-void MessageEndpoint::handlePixmapMessage(ChatMessage* pixmapMessage)
+void MessageEndpoint::handleInternalMessage(ChatMessage* m)
+{
+	cout << "[MessageEndpoint] Processing internal message: " << m->messageDataAsUTF8String().toStdString() << endl;
+
+	if(m->flags().type() == IDENTIFICATION)
+	{
+		handleIndentityMessage(m);
+	}
+	else if(mLocalIdentState != IDENTIFIED || mRemoteIdentState != IDENTIFIED)
+	{
+		writeInternalMessageString(REQUIRES_IDENTIFICATON_STRING, IDENTIFICATION);
+		emit unidentifiedClientSentMessage();
+	}
+	else if(m->flags().type() == ENDPOINT_PIXMAP_EXCHANGE)
+	{
+		handlePixmapExchangeMessage(m);
+	}
+	else
+	{
+		cerr << "[MessageEndpoint] Internal message not understood. We don't know how to handle the message type." << endl;
+		writeInternalMessageString("UNKNOWN_COMMAND", PROTOCOL_ERROR);
+	}
+}
+
+void MessageEndpoint::handleIndentityMessage(ChatMessage* request)
+{
+	QString requestString = request->messageDataAsUTF8String();
+
+	if(mRemoteIdentState == IDENTIFIED && requestString == IDENTITY_UPDATE_AVAILABLE_STRING)
+	{
+		requestIdentity();
+	}
+	if(mRemoteIdentState == IDENTITY_REQUESTED)
+	{
+		identityRecieved(requestString);
+	}
+	else if(mLocalIdentState == NOT_IDENTIFIED && requestString == IDENTITY_REQUEST_STRING)
+	{
+		mLocalIdentState = IDENTITY_REQUESTED;
+		sendIdentity();
+	}
+	else if(mLocalIdentState == IDENTITY_SENT)
+	{
+		if(remoteName() == IDENTIFIED_STRING)
+		{
+			cout << "[MessageEndpoint] Remote successfully identified is." << endl;
+			mRemoteIdentState = IDENTIFIED;
+		}
+		else
+		{
+			cerr << "[MessageEndpoint] An unhandled protocol error occured: " << request->messageDataAsUTF8String().toStdString() << endl;
+			mRemoteIdentState = NOT_IDENTIFIED;
+			emit identificationFailed(ConnectionError(IDENT_UNSPECIFIED_ERROR));
+		}
+	}
+	else
+	{
+		cerr << "[MessageEndpoint] Identity message: " << requestString.toStdString()
+			 << " not understood in current state: " << identityStateString().toStdString() << endl;
+		writeInternalMessageString("UNKNOWN_COMMAND", PROTOCOL_ERROR);
+	}
+
+	if(mLocalIdentState == IDENTIFIED && mRemoteIdentState == IDENTIFIED)
+	{
+		cout << "[MessageEndpoint] Identification complete." << endl;
+		emit identificationSuccessful();
+	}
+}
+void MessageEndpoint::requestIdentity()
+{
+	cout << "[MessageEndpoint] Requesting identification from remote." << endl;
+	writeInternalMessageString(IDENTITY_REQUEST_STRING, IDENTIFICATION);
+	mRemoteIdentState = IDENTITY_REQUESTED;
+}
+
+void MessageEndpoint::notifyRemoteAboutIdentityUpdate()
+{
+	writeInternalMessageString(IDENTITY_UPDATE_AVAILABLE_STRING, IDENTIFICATION);
+}
+void MessageEndpoint::sendIdentity()
+{
+	cout << "[MessageEndpoint] Sending identity to remote." << endl;
+
+	writeInternalMessageString(mClientManager->localName(), IDENTIFICATION);
+	mLocalIdentState = IDENTITY_SENT;
+}
+void MessageEndpoint::identityRecieved(QString remoteName)
+{
+	if(remoteName.isEmpty())
+	{
+		writeInternalMessageString(SENT_EMPTY_NAME_STRING, IDENTIFICATION);
+		cerr << "Remote host " + mSocket->localAddress().toString().toStdString()
+							+ " violated IDENTIFY protocol. They sent back an empty name.";
+		mRemoteIdentState = NOT_IDENTIFIED;
+		emit identificationFailed(ConnectionError(IDENT_SENT_EMPTY_NAME));
+	}
+	else
+	{
+		writeInternalMessageString(IDENTIFIED_STRING, IDENTIFICATION);
+		setRemoteName(remoteName);
+		mRemoteIdentState = IDENTIFIED;
+		cout << "[MessageEndpoint] Remote successfully identified with name: " << mRemoteName.toStdString() << endl;
+		emit remoteIdentified();
+	}
+}
+
+void MessageEndpoint::handlePixmapExchangeMessage(ChatMessage* pixmapMessage)
 {
 	QString messageUTF8 = pixmapMessage->messageDataAsUTF8String();
 	if((mLocalPixmapState == PIXMAP_NOT_SENT || mLocalPixmapState == PIXMAP_UPDATE_AVAILABLE)

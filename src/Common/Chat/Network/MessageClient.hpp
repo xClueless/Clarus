@@ -7,17 +7,11 @@ class MessageClient : public MessageEndpoint
 {
 private:
 	Q_OBJECT
-	void handleIdentityMessage(ChatMessage* request);
-	void identityRecieved(ChatMessage* m);
 public:
 	MessageClient(ClientManager* clientManager, QTcpSocket* socket, QObject* parent=0);
 public slots:
-	void sendName();
-	void processInternalMessage(ChatMessage* request);
+	void handleInternalMessage(ChatMessage* request);
 	void connectToServer(QString clientHostname, quint16 mPort);
-signals:
-	void identificationSuccesful();
-	void identificationFailed(ConnectionError connectionError);
 };
 
 #endif // MESSAGESERVER_HPP

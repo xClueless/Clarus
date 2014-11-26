@@ -8,18 +8,10 @@ class MessageServer : public MessageEndpoint
 {
 private:
 	Q_OBJECT
-	void identityRecieved(ChatMessage* m);
-	void sendIdentity();
-	void handleIndentityMessage(ChatMessage* request);
 public:
 	explicit MessageServer(ClientManager* clientManager, QTcpSocket* socket, QObject* parent = 0);
-signals:
-	void unidentifiedClientSentMessage();
-	void identificationSuccesful();
-	void identificationFailed(ConnectionError connectionError);
 public slots:
-	void processInternalMessage(ChatMessage* m);
-	void requestIdentification();
+	void handleInternalMessage(ChatMessage* m);
 };
 
 #endif // MESSAGECLIENT_HPP

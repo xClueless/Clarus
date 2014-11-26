@@ -23,11 +23,11 @@ private:
 
 	QTcpServer* mServerSocket;
 	QUdpSocket* mBroadcastSocket;
+	uint32_t mPort;
 
 	QString mLocalName;
 	QPixmap mLocalPixmap;
 
-	uint32_t mPort;
 	QList<MessageEndpoint*> mIdentifiedEndpoints;
 	QList<MessageServer*> mServersThatNeedIdentification;
 	QList<MessageClient*> mClientsThatNeedToIdentify;

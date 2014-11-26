@@ -144,10 +144,10 @@ void ClientManager::newClientConnected()
 
 	MessageServer* server = new MessageServer(this, newClient);
 	connect(server, SIGNAL(connectionFailed(ConnectionError)), this, SLOT(clientFailedToIdentify(ConnectionError)));
-	connect(server, SIGNAL(identificationSuccesful()), this, SLOT(clientIdentified()));
+	connect(server, SIGNAL(identificationSuccessful()), this, SLOT(clientIdentified()));
 	connect(server, SIGNAL(identificationFailed(ConnectionError)), this, SLOT(clientFailedToIdentify(ConnectionError)));
 	mServersThatNeedIdentification << server;
-	server->requestIdentification();
+	server->requestIdentity();
 }
 
 void ClientManager::connectToServer(QString serverHostname)
@@ -161,7 +161,7 @@ void ClientManager::connectToServer(QString serverHostname)
 
 	MessageClient* mc = new MessageClient(this, remoteServer);
 	connect(mc, SIGNAL(connectionFailed(ConnectionError)), this, SLOT(serverFailedToIdentifyUs(ConnectionError)));
-	connect(mc, SIGNAL(identificationSuccesful()), this, SLOT(serverIdentifiedUs()));
+	connect(mc, SIGNAL(identificationSuccessful()), this, SLOT(serverIdentifiedUs()));
 	connect(mc, SIGNAL(identificationFailed(ConnectionError)), this, SLOT(serverFailedToIdentifyUs(ConnectionError)));
 	mClientsThatNeedToIdentify.append(mc);
 	mc->connectToServer(serverHostname, mPort);
