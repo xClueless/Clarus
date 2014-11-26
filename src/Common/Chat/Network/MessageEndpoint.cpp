@@ -199,8 +199,9 @@ void MessageEndpoint::handleIndentityMessage(ChatMessage* request)
 	{
 		if(requestString == IDENTIFIED_STRING)
 		{
-			cout << "[MessageEndpoint] Remote successfully identified is." << endl;
+			cout << "[MessageEndpoint] Remote successfully identified us." << endl;
 			mRemoteIdentState = IDENTIFIED;
+			emit remoteIdentifiedUs();
 		}
 		else
 		{

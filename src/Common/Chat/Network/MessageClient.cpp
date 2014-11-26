@@ -8,7 +8,11 @@ using namespace std;
 MessageClient::MessageClient(ClientManager* clientManager, QTcpSocket* socket, QObject* parent)
 	: MessageEndpoint(clientManager, socket, parent)
 {
-	connect(mSocket, SIGNAL(connected()), this, SLOT(requestIdentity()));
+	//Client connects to server.
+	//Server asks client for identification.
+	//Client identifies.
+	//Client asks for identification.
+	connect(this, SIGNAL(remoteIdentifiedUs()), this, SLOT(requestIdentity()));
 }
 
 void MessageClient::connectToServer(QString clientHostname, quint16 mPort)

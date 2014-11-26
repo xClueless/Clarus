@@ -11,7 +11,11 @@ using namespace std;
 MessageServer::MessageServer(ClientManager* clientManager, QTcpSocket* socket, QObject* parent)
 	: MessageEndpoint(clientManager, socket, parent)
 {
-	connect(this, SIGNAL(remoteIdentified()), this, SLOT(requestIdentity()));
+	//Client connects to server.
+	//Server asks client for identification.
+	connect(mSocket, SIGNAL(connected()), this, SLOT(requestIdentity()));
+	//Client identifies.
+	//Client asks for identification.
 }
 void MessageServer::handleInternalMessage(ChatMessage* m)
 {

@@ -87,6 +87,7 @@ signals:
 	void messageReady(ChatMessage* m);
 	void connectionFailed(ConnectionError ce);
 	void remoteIdentified();
+	void remoteIdentifiedUs();
 	void identificationSuccessful();
 	void identificationFailed(ConnectionError connectionError);
 	void unidentifiedClientSentMessage();
