@@ -200,13 +200,13 @@ void MessageEndpoint::handleIndentityMessage(ChatMessage* request)
 		if(requestString == IDENTIFIED_STRING)
 		{
 			cout << "[MessageEndpoint] Remote successfully identified us." << endl;
-			mRemoteIdentState = IDENTIFIED;
+			mLocalIdentState = IDENTIFIED;
 			emit remoteIdentifiedUs();
 		}
 		else
 		{
 			cerr << "[MessageEndpoint] An unhandled protocol error occured: " << request->messageDataAsUTF8String().toStdString() << endl;
-			mRemoteIdentState = NOT_IDENTIFIED;
+			mLocalIdentState = NOT_IDENTIFIED;
 			emit identificationFailed(ConnectionError(IDENT_UNSPECIFIED_ERROR));
 		}
 	}
