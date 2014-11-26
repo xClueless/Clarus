@@ -9,7 +9,7 @@ using namespace std;
 MessageFlags::MessageFlags()
 {
 }
-MessageFlags::MessageFlags(MessageType type, MessageFormat format) : mType(type)
+MessageFlags::MessageFlags(MessageType type, MessageFormat format) : mType(type), mFormat(format)
 {
 }
 
