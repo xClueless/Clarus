@@ -147,7 +147,6 @@ void ClientManager::newClientConnected()
 	connect(server, SIGNAL(identificationSuccessful()), this, SLOT(clientIdentified()));
 	connect(server, SIGNAL(identificationFailed(ConnectionError)), this, SLOT(clientFailedToIdentify(ConnectionError)));
 	mServersThatNeedIdentification << server;
-	server->requestIdentity();
 }
 
 void ClientManager::connectToServer(QString serverHostname)
