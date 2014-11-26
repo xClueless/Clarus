@@ -86,7 +86,7 @@ void MessageServer::processInternalMessage(ChatMessage* m)
 {
 //	cout << "[MessageServer] Processing internal message." << endl;
 
-	if(m->flags().type() != IDENTIFICATION)
+	if(m->flags().type() == IDENTIFICATION)
 	{
 		handleIndentityMessage(m);
 	}
