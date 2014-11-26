@@ -61,6 +61,7 @@ void ChatMessage::setTargetEndpoints(QStringList newTargetEndpoints)
 	mTargetEndpoints = newTargetEndpoints;
 	mTargetEnpointsArray = mTargetEndpoints.join(LIST_DELIMITER).toUtf8();
 	mMessageFlags.setEndpointListSize(mTargetEnpointsArray.size());
+	cout << "[ChatMessage] Target enpdoints set to: " << mTargetEndpoints.join(LIST_DELIMITER).toStdString() << endl;
 }
 QString ChatMessage::messageAsUTF8String() const
 {
