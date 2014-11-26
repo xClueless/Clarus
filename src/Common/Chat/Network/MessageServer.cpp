@@ -11,12 +11,13 @@ using namespace std;
 MessageServer::MessageServer(ClientManager* clientManager, QTcpSocket* socket, QObject* parent)
 	: MessageEndpoint(clientManager, socket, parent)
 {
-	//Client connects to server.
+	//Client has already connected at this point.
 	//Server asks client for identification.
-	connect(mSocket, SIGNAL(connected()), this, SLOT(requestIdentity()));
+	requestIdentity();
 	//Client identifies.
 	//Client asks for identification.
 }
+
 void MessageServer::handleInternalMessage(ChatMessage* m)
 {
 	cout << "[MessageServer] Passing internal message down." << endl;
