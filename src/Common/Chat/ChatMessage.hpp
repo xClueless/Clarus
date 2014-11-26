@@ -21,8 +21,8 @@ private:
 	void processStringData(QByteArray messageByteArray);
 public:
 	ChatMessage(QByteArray messageByteArray, QString sender);
-	ChatMessage(MessageType type, QString message);
-	ChatMessage(MessageType type, QByteArray messageData);
+	ChatMessage(MessageFlags flags, QString message);
+	ChatMessage(MessageFlags flags, QByteArray messageData);
 
 	QString sender();
 	void setSender(QString sender);

@@ -22,18 +22,18 @@ ChatMessage::ChatMessage(QByteArray messageByteArray, QString sender)
 	mMessageData = messageByteArray;
 	mSender = sender;
 }
-ChatMessage::ChatMessage(MessageType type, QString message) : mMessageFlags(type)
+ChatMessage::ChatMessage(MessageFlags flags, QString message) : mMessageFlags(flags)
 {
 	mMessageData = message.toUtf8();
 }
 
-ChatMessage::ChatMessage(MessageType type, QByteArray messageData)
-	: mMessageData(messageData), mMessageFlags(type)
+ChatMessage::ChatMessage(MessageFlags flags, QByteArray messageData)
+	: mMessageData(messageData), mMessageFlags(flags)
 {
 }
 QString ChatMessage::messageAsUTF8String() const
 {
-	if(mMessageFlags.type() == RAW)
+	if(mMessageFlags.format() == RAW)
 	{
 		return "RAW_MESSAGE";
 	}

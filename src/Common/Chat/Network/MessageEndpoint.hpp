@@ -57,7 +57,7 @@ protected:
 	QPixmap mRemotePixmap;
 
 	void writeInternalMessageString(QString messageString);
-	void writeInternalMessageBytes(QByteArray messageBytes);
+	void writeInternalMessageBytes(QByteArray messageBytes, MessageFormat format);
 
 	QString identStateString();
 public:

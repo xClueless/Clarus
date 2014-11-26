@@ -27,15 +27,15 @@ void MessageEndpoint::sendIdentError()
 }
 void MessageEndpoint::writeInternalMessageString(QString messageString)
 {
-	ChatMessage internalMessage(INTERNAL, messageString);
+	writeInternalMessageBytes(messageString.toUtf8(), UTF8);
+}
+
+void MessageEndpoint::writeInternalMessageBytes(QByteArray messageBytes, MessageFormat format)
+{
+	ChatMessage internalMessage(MessageFlags(INTERNAL, format), messageBytes);
 	writeChatMessage(&internalMessage);
 }
 
-void MessageEndpoint::writeInternalMessageBytes(QByteArray messageBytes)
-{
-	ChatMessage internalMessage(INTERNAL, messageBytes);
-	writeChatMessage(&internalMessage);
-}
 
 QString MessageEndpoint::identStateString()
 {
@@ -164,13 +164,13 @@ void MessageEndpoint::sendPixmap()
 	QBuffer pixmapBuffer(&pixmapArray);
 	pixmapBuffer.open(QIODevice::WriteOnly);
 	mClientManager->localPixmap().save(&pixmapBuffer, "PNG");
-	writeInternalMessageBytes(pixmapArray);
+	writeInternalMessageBytes(pixmapArray, RAW);
 	mLocalPixmapState = PIXMAP_SENT;
 }
 
 void MessageEndpoint::recievePixmap(ChatMessage* m)
 {
-	cout << "[MessageEndpoint] Recieving pixmap to remote." << endl;
+	cout << "[MessageEndpoint] Recieving pixmap from remote." << endl;
 
 	if(mRemotePixmap.loadFromData(m->messageBytes(), "PNG"))
 	{

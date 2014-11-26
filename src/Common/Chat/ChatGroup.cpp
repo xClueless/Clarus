@@ -98,7 +98,7 @@ void ChatGroup::messageAll(QString messageString)
 {
 	if(!empty())
 	{
-		ChatMessage message(PRIVATE, messageString);
+		ChatMessage message(MessageFlags(PRIVATE, UTF8), messageString);
 		for(MessageEndpoint* endpoint : mEndpoints)
 		{
 			endpoint->writeChatMessage(&message);

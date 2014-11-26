@@ -35,7 +35,7 @@ ChatGroup* ChatWindow::group()
 
 void ChatWindow::messageReadyToSend()
 {
-	ChatMessage message(PRIVATE, mInputBox->text());
+	ChatMessage message(MessageFlags(PRIVATE, UTF8), mInputBox->text());
 	mGroup->messageAll(&message);
 	addMessageBox("Me:" + message.messageBytes());
 	mInputBox->clear();
@@ -57,7 +57,7 @@ void ChatWindow::addMessageBox(QString messageDisplayString)
 	QString sender = messageDisplayString.section(':', 0, 0);
 	QString messageString = messageDisplayString.section(':', 1);
 
-	ChatMessage* newMessage = new ChatMessage(PRIVATE, messageString);
+	ChatMessage* newMessage = new ChatMessage(MessageFlags(PRIVATE, UTF8), messageString);
 	newMessage->setSender(sender);
 	MessageLabel* widget = new MessageLabel(newMessage);
 
