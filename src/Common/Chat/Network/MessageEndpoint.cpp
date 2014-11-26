@@ -186,7 +186,7 @@ void MessageEndpoint::handlePixmapMessage(ChatMessage* pixmapMessage)
 		//Remote: ${RAWPIXMAP}
 		recievePixmap(pixmapMessage);
 	}
-	else if(mRemotePixmapState == PIXMAP_SENT && messageUTF8 == PIXMAP_UPDATE_AVAILABLE_STRING)
+	else if(mRemotePixmapState == PIXMAP_RECIEVED && messageUTF8 == PIXMAP_UPDATE_AVAILABLE_STRING)
 	{
 		cout << "[MessageEndpoint] Remote has informed us about an available pixmap update." << endl;
 		mRemotePixmapState = PIXMAP_UPDATE_AVAILABLE;
