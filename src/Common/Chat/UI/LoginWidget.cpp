@@ -6,8 +6,8 @@
 
 using namespace std;
 
-LoginWidget::LoginWidget(ClientManager* clientManager, QWidget* parent)
-	: QWidget(parent), mClientManager(clientManager)
+LoginWidget::LoginWidget(EndpointManager* endpointManager, QWidget* parent)
+	: QWidget(parent), mEndpointManager(endpointManager)
 {
 	mLayout = new QFormLayout(this);
 	setLayout(mLayout);
@@ -19,7 +19,7 @@ LoginWidget::LoginWidget(ClientManager* clientManager, QWidget* parent)
 	connect(mLoginButton, SIGNAL(clicked()), this, SLOT(login()));
 	mLayout->addWidget(mLoginButton);
 
-	mMainWindow = new MainWindow(clientManager);
+	mMainWindow = new MainWindow(endpointManager);
 }
 
 LoginWidget::~LoginWidget()
@@ -56,10 +56,10 @@ void LoginWidget::login()
 	}
 	else
 	{
-		mClientManager->setLocalName(localName);
+		mEndpointManager->setLocalName(localName);
 		try
 		{
-			mClientManager->start();
+			mEndpointManager->start();
 		}
 		catch(const runtime_error& re)
 		{

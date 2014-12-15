@@ -6,7 +6,7 @@
 #include <QStringList>
 #include <QPixmap>
 #include "Network/MessageEndpoint.hpp"
-#include "Network/ClientManager.hpp"
+#include "Network/EndpointManager.hpp"
 
 class ChatGroup : public QObject
 {
@@ -16,11 +16,11 @@ private:
 
 	QString mGroupName;
 	QPixmap mGroupPixmap;
-	ClientManager* mClientManager;
+	EndpointManager* mEndpointManager;
 	QList<MessageEndpoint*> mEndpoints;
 public:
-	explicit ChatGroup(ClientManager* clientManager, MessageEndpoint* endpoint, QObject *parent = 0);
-	explicit ChatGroup(ClientManager* clientManager, QSet<MessageEndpoint*> endpoints, QObject *parent = 0);
+	explicit ChatGroup(EndpointManager* endpointManager, MessageEndpoint* endpoint, QObject *parent = 0);
+	explicit ChatGroup(EndpointManager* endpointManager, QSet<MessageEndpoint*> endpoints, QObject *parent = 0);
 	virtual ~ChatGroup();
 	QList<MessageEndpoint*> endpoints();
 	void addEndpoint(MessageEndpoint* endpoint);

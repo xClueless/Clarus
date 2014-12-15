@@ -5,7 +5,7 @@
 #include <QBoxLayout>
 #include <QLineEdit>
 #include <QPushButton>
-#include "../Network/ClientManager.hpp"
+#include "../Network/EndpointManager.hpp"
 #include "LocalIdentityWidget.hpp"
 #include "EndpointListWidget.hpp"
 
@@ -13,14 +13,14 @@ class MainWindow : public QWidget
 {
 private:
 	Q_OBJECT
-	ClientManager* mClientManager;
+	EndpointManager* mEndpointManager;
 	QVBoxLayout* mLayout;
 	LocalIdentityWidget* mLocalIdentityWidget;
 	QPushButton* mConnectToEndpointButton;
 	QPushButton* mBroadcastForEndpointsButton;
 	EndpointListWidget* mEndpointListWidget;
 public:
-	explicit MainWindow(ClientManager* clientManager, QWidget *parent = 0);
+	explicit MainWindow(EndpointManager* endpointManager, QWidget *parent = 0);
 	virtual ~MainWindow();
 
 signals:

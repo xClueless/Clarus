@@ -4,14 +4,14 @@
 
 using namespace std;
 
-ChatGroup::ChatGroup(ClientManager* clientManager, MessageEndpoint* endpoint, QObject* parent)
-	: QObject(parent), mClientManager(clientManager), mGroupPixmap(DEFAULT_GROUP_ICON_PATH)
+ChatGroup::ChatGroup(EndpointManager* endpointManager, MessageEndpoint* endpoint, QObject* parent)
+	: QObject(parent), mEndpointManager(endpointManager), mGroupPixmap(DEFAULT_GROUP_ICON_PATH)
 {
 	addEndpoint(endpoint);
 }
 
-ChatGroup::ChatGroup(ClientManager* clientManager, QSet<MessageEndpoint*> endpoints, QObject *parent)
-	: QObject(parent), mClientManager(clientManager), mGroupPixmap(DEFAULT_GROUP_ICON_PATH)
+ChatGroup::ChatGroup(EndpointManager* endpointManager, QSet<MessageEndpoint*> endpoints, QObject *parent)
+	: QObject(parent), mEndpointManager(endpointManager), mGroupPixmap(DEFAULT_GROUP_ICON_PATH)
 {
 	for(MessageEndpoint* endpoint : endpoints)
 	{
@@ -107,7 +107,7 @@ void ChatGroup::messageAll(QString messageString)
 {
 	if(!empty())
 	{
-		ChatMessage message(MessageFlags(PRIVATE, UTF8), messageString);
+		ChatMessage message(MessageFlags(MessageType::PRIVATE, MessageFormat::UTF8), messageString);
 		for(MessageEndpoint* endpoint : mEndpoints)
 		{
 			endpoint->writeChatMessage(&message);

@@ -13,7 +13,7 @@
 //#include "TimeUtil.h"
 
 #include <QApplication>
-#include "Chat/Network/ClientManager.hpp"
+#include "Chat/Network/EndpointManager.hpp"
 #include "Chat/UI/ChatWindow.hpp"
 #include "Chat/UI/MainWindow.hpp"
 #include "Chat/UI/LoginWidget.hpp"
@@ -127,11 +127,11 @@ void qtThread(int argc, char** argv, options opts)
 {
 	QApplication a(argc, argv);
 
-	ClientManager clientManager(opts.clientName.data(), CHAT_SERVER_PORT);
+	EndpointManager endpointManager(opts.clientName.data(), CHAT_SERVER_PORT);
 
-	LoginWidget loginWidget(&clientManager);
+	LoginWidget loginWidget(&endpointManager);
 	loginWidget.show();
-//	MainWindow mainWindow(&clientManager);
+//	MainWindow mainWindow(&endpointManager);
 //	mainWindow.show();
 
 	a.exec();

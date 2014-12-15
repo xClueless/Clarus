@@ -3,15 +3,15 @@
 
 #include <QWidget>
 #include <QDialog>
-#include "../Network/ClientManager.hpp"
+#include "../Network/EndpointManager.hpp"
 
 class SelectEndpointsDialog : public QDialog
 {
 private:
 	Q_OBJECT
-	ClientManager* mClientManager;
+	EndpointManager* mEndpointManager;
 public:
-	explicit SelectEndpointsDialog(ClientManager* clientManager, QWidget *parent = 0);
+	explicit SelectEndpointsDialog(EndpointManager* endpointManager, QWidget *parent = 0);
 
 signals:
 

@@ -34,7 +34,7 @@ ChatMessage::ChatMessage(MessageFlags flags, QByteArray messageData)
 }
 QString ChatMessage::messageDataAsUTF8String() const
 {
-	if(mMessageFlags.format() == RAW)
+	if(mMessageFlags.format() == MessageFormat::RAW)
 	{
 		return "RAW_MESSAGE";
 	}

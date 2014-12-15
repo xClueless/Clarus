@@ -8,14 +8,14 @@
 #include <QGroupBox>
 #include <QBoxLayout>
 #include <QFormLayout>
-#include "../Network/ClientManager.hpp"
+#include "../Network/EndpointManager.hpp"
 #include "MainWindow.hpp"
 
 class LoginWidget : public QWidget
 {
 private:
 	Q_OBJECT
-	ClientManager* mClientManager;
+	EndpointManager* mEndpointManager;
 	QFormLayout* mLayout;
 	QLabel* mLocalNameLabel;
 	QLineEdit* mLocalNameField;
@@ -24,7 +24,7 @@ private:
 	MainWindow* mMainWindow;
 
 public:
-	explicit LoginWidget(ClientManager* clientManager, QWidget *parent = 0);
+	explicit LoginWidget(EndpointManager* endpointManager, QWidget *parent = 0);
 	virtual ~LoginWidget();
 	void createCredentialBox();
 	MainWindow* mainWindow();

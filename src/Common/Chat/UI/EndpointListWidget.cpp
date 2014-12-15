@@ -1,14 +1,14 @@
 #include "EndpointListWidget.hpp"
 
-EndpointListWidget::EndpointListWidget(ClientManager* clientManager, QWidget *parent) :
-	QWidget(parent), mClientManager(clientManager)
+EndpointListWidget::EndpointListWidget(EndpointManager* endpointManager, QWidget *parent) :
+	QWidget(parent), mEndpointManager(endpointManager)
 {
 	setWindowTitle("Contacts");
 
 	mLayout = new QGridLayout(this);
 	setLayout(mLayout);
 
-	connect(mClientManager, SIGNAL(endpointIdentified(MessageEndpoint*)), this, SLOT(endpointIdentified(MessageEndpoint*)));
+	connect(mEndpointManager, SIGNAL(endpointIdentified(MessageEndpoint*)), this, SLOT(endpointIdentified(MessageEndpoint*)));
 }
 
 EndpointListWidget::~EndpointListWidget()
@@ -27,7 +27,7 @@ void EndpointListWidget::endpointButtonClicked()
 
 void EndpointListWidget::endpointIdentified(MessageEndpoint* endpoint)
 {
-	ChatGroup* group = new ChatGroup(mClientManager, endpoint, this);
+	ChatGroup* group = new ChatGroup(mEndpointManager, endpoint, this);
 	mChatGroups << group;
 	EndpointButton* newEndpointButton = new EndpointButton(group, this);
 	connect(newEndpointButton, SIGNAL(clicked()), this, SLOT(endpointButtonClicked()));

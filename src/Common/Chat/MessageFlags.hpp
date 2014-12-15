@@ -4,14 +4,14 @@
 #include <QString>
 #include <QByteArray>
 
-enum MessageType
+enum class MessageType
 {
 	IDENTIFICATION,
-	ENDPOINT_PIXMAP_EXCHANGE,
+	PIXMAP_EXCHANGE,
 	PRIVATE,
 	PROTOCOL_ERROR
 };
-enum MessageFormat
+enum class MessageFormat
 {
 	RAW,
 	UTF8
@@ -28,8 +28,8 @@ private:
 	QChar PRIVATE_CHAR = 'P';
 	QChar PROTOCOL_ERROR_CHAR = 'E';
 
-	MessageType mType = PRIVATE;
-	MessageFormat mFormat = UTF8;
+	MessageType mType = MessageType::PRIVATE;
+	MessageFormat mFormat = MessageFormat::UTF8;
 
 	QChar typeAsChar() const;
 	MessageType typeFromChar(QChar typeCharacter) const;

@@ -2,8 +2,8 @@
 
 #include <QFileDialog>
 
-LocalIdentityWidget::LocalIdentityWidget(ClientManager* clientManager, QWidget* parent)
-	: QWidget(parent), mClientManager(clientManager)
+LocalIdentityWidget::LocalIdentityWidget(EndpointManager* endpointManager, QWidget* parent)
+	: QWidget(parent), mEndpointManager(endpointManager)
 {
 	mLayout = new QHBoxLayout(this);
 	setLayout(mLayout);
@@ -17,23 +17,23 @@ LocalIdentityWidget::LocalIdentityWidget(ClientManager* clientManager, QWidget* 
 	mLayout->addWidget(mLocalNameLabel);
 
 	mLocalNameBox = new QLineEdit(this);
-	mLocalNameBox->setText(mClientManager->localName());
+	mLocalNameBox->setText(mEndpointManager->localName());
 	connect(mLocalNameBox, SIGNAL(returnPressed()), this, SLOT(sendNewLocalName()));
-	connect(mClientManager, SIGNAL(localNameChanged()), this, SLOT(retrieveNewLocalName()));
+	connect(mEndpointManager, SIGNAL(localNameChanged()), this, SLOT(retrieveNewLocalName()));
 
 	mLayout->addWidget(mLocalNameBox);
 
-	connect(mClientManager, SIGNAL(localPixmapChanged()), this, SLOT(updatePixmap()));
+	connect(mEndpointManager, SIGNAL(localPixmapChanged()), this, SLOT(updatePixmap()));
 }
 
 void LocalIdentityWidget::sendNewLocalName()
 {
-	mClientManager->setLocalName(mLocalNameBox->text());
+	mEndpointManager->setLocalName(mLocalNameBox->text());
 }
 
 void LocalIdentityWidget::retrieveNewLocalName()
 {
-	mLocalNameBox->setText(mClientManager->localName());
+	mLocalNameBox->setText(mEndpointManager->localName());
 }
 
 void LocalIdentityWidget::selectNewPixmap()
@@ -41,11 +41,11 @@ void LocalIdentityWidget::selectNewPixmap()
 	QString pixmapFileName = QFileDialog::getOpenFileName(this, "Select Picture", QString(), "PNG Image (*.png)");
 	if(!pixmapFileName.isNull())
 	{
-		mClientManager->loadLocalPixmap(pixmapFileName);
+		mEndpointManager->loadLocalPixmap(pixmapFileName);
 	}
 }
 
 void LocalIdentityWidget::updatePixmap()
 {
-	mLocalPixmapButton->setIcon(QIcon(mClientManager->localPixmap()));
+	mLocalPixmapButton->setIcon(QIcon(mEndpointManager->localPixmap()));
 }

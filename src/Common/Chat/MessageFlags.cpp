@@ -54,20 +54,20 @@ QChar MessageFlags::typeAsChar() const
 {
 	switch(mType)
 	{
-		case IDENTIFICATION: return INDENTIFICATION_CHAR;
-		case ENDPOINT_PIXMAP_EXCHANGE: return ENDPOINT_PIXMAP_EXCHANGE_CHAR;
-		case PRIVATE: return PRIVATE_CHAR;
-		case PROTOCOL_ERROR: return PROTOCOL_ERROR_CHAR;
-		default: throw runtime_error("Unknown type flag: " + mType);
+		case MessageType::IDENTIFICATION: return INDENTIFICATION_CHAR;
+		case MessageType::PIXMAP_EXCHANGE: return ENDPOINT_PIXMAP_EXCHANGE_CHAR;
+		case MessageType::PRIVATE: return PRIVATE_CHAR;
+		case MessageType::PROTOCOL_ERROR: return PROTOCOL_ERROR_CHAR;
+		default: throw runtime_error("Unknown type flag");
 	}
 }
 
 MessageType MessageFlags::typeFromChar(QChar typeCharacter) const
 {
-	if(typeCharacter == INDENTIFICATION_CHAR) return IDENTIFICATION;
-	if(typeCharacter == ENDPOINT_PIXMAP_EXCHANGE_CHAR) return ENDPOINT_PIXMAP_EXCHANGE;
-	if(typeCharacter == PRIVATE_CHAR) return PRIVATE;
-	if(typeCharacter == PROTOCOL_ERROR_CHAR) return PROTOCOL_ERROR;
+	if(typeCharacter == INDENTIFICATION_CHAR) return MessageType::IDENTIFICATION;
+	if(typeCharacter == ENDPOINT_PIXMAP_EXCHANGE_CHAR) return MessageType::PIXMAP_EXCHANGE;
+	if(typeCharacter == PRIVATE_CHAR) return MessageType::PRIVATE;
+	if(typeCharacter == PROTOCOL_ERROR_CHAR) return MessageType::PROTOCOL_ERROR;
 	throw runtime_error("Unknown type flag: " + typeCharacter.toLatin1());
 }
 
@@ -75,16 +75,16 @@ QChar MessageFlags::formatAsChar() const
 {
 	switch(mFormat)
 	{
-		case RAW: return RAW_CHAR;
-		case UTF8: return UTF8_CHAR;
-		default: throw runtime_error("Unknown format flag: " + mFormat);
+		case MessageFormat::RAW: return RAW_CHAR;
+		case MessageFormat::UTF8: return UTF8_CHAR;
+		default: throw runtime_error("Unknown format flag");
 	}
 }
 
 MessageFormat MessageFlags::formatFromChar(QChar formatCharacter) const
 {
-	if(formatCharacter == RAW_CHAR) return RAW;
-	if(formatCharacter == UTF8_CHAR) return UTF8;
+	if(formatCharacter == RAW_CHAR) return MessageFormat::RAW;
+	if(formatCharacter == UTF8_CHAR) return MessageFormat::UTF8;
 	throw runtime_error("Unknown type flag: " + formatCharacter.toLatin1());
 }
 

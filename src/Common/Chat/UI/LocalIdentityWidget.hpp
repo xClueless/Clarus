@@ -6,19 +6,19 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QPushButton>
-#include "../Network/ClientManager.hpp"
+#include "../Network/EndpointManager.hpp"
 
 class LocalIdentityWidget : public QWidget
 {
 private:
 	Q_OBJECT
-	ClientManager* mClientManager;
+	EndpointManager* mEndpointManager;
 	QHBoxLayout* mLayout;
 	QPushButton* mLocalPixmapButton;
 	QLabel* mLocalNameLabel;
 	QLineEdit* mLocalNameBox;
 public:
-	explicit LocalIdentityWidget(ClientManager* clientManager, QWidget *parent = 0);
+	explicit LocalIdentityWidget(EndpointManager* endpointManager, QWidget *parent = 0);
 
 signals:
 

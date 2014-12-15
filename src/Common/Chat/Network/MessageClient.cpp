@@ -1,12 +1,12 @@
 #include "MessageClient.hpp"
 
 #include <iostream>
-#include "ClientManager.hpp"
+#include "EndpointManager.hpp"
 
 using namespace std;
 
-MessageClient::MessageClient(ClientManager* clientManager, QTcpSocket* socket, QObject* parent)
-	: MessageEndpoint(clientManager, socket, parent)
+MessageClient::MessageClient(EndpointManager* endpointManager, QTcpSocket* socket, QObject* parent)
+	: MessageEndpoint(endpointManager, socket, parent)
 {
 	//Client connects to server.
 	//Server asks client for identification.

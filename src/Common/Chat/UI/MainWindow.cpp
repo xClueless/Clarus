@@ -3,15 +3,15 @@
 #include <QInputDialog>
 #include <QMessageBox>
 
-MainWindow::MainWindow(ClientManager* clientManager, QWidget* parent)
-	: QWidget(parent), mClientManager(clientManager)
+MainWindow::MainWindow(EndpointManager* endpointManager, QWidget* parent)
+	: QWidget(parent), mEndpointManager(endpointManager)
 {
-	connect(mClientManager, SIGNAL(failedToConnectToEndpoint(MessageEndpoint*, ConnectionError)), this, SLOT(endpointFailedToConnect(MessageEndpoint*, ConnectionError)));
+	connect(mEndpointManager, SIGNAL(failedToConnectToEndpoint(MessageEndpoint*, ConnectionError)), this, SLOT(endpointFailedToConnect(MessageEndpoint*, ConnectionError)));
 
 	mLayout = new QVBoxLayout(this);
 	setLayout(mLayout);
 
-	mLocalIdentityWidget = new LocalIdentityWidget(mClientManager, this);
+	mLocalIdentityWidget = new LocalIdentityWidget(mEndpointManager, this);
 	mLayout->addWidget(mLocalIdentityWidget);
 
 	mConnectToEndpointButton = new QPushButton("+", this);
@@ -19,10 +19,10 @@ MainWindow::MainWindow(ClientManager* clientManager, QWidget* parent)
 	mLayout->addWidget(mConnectToEndpointButton);
 
 	mBroadcastForEndpointsButton = new QPushButton("Find Local Clients", this);
-	connect(mBroadcastForEndpointsButton, SIGNAL(clicked()), mClientManager, SLOT(sendBroadcast()));
+	connect(mBroadcastForEndpointsButton, SIGNAL(clicked()), mEndpointManager, SLOT(sendBroadcast()));
 	mLayout->addWidget(mBroadcastForEndpointsButton);
 
-	mEndpointListWidget = new EndpointListWidget(mClientManager, this);
+	mEndpointListWidget = new EndpointListWidget(mEndpointManager, this);
 	mLayout->addWidget(mEndpointListWidget);
 }
 
@@ -33,7 +33,7 @@ MainWindow::~MainWindow()
 void MainWindow::connectToEndpoint()
 {
 	QString endpointRemoteName = QInputDialog::getText(this, "Connect to Endpoint", "Endpoint IP/Hostname");
-	mClientManager->connectToServer(endpointRemoteName);
+	mEndpointManager->connectToServer(endpointRemoteName);
 }
 
 void MainWindow::endpointFailedToConnect(MessageEndpoint* endpoint, ConnectionError connectionError)

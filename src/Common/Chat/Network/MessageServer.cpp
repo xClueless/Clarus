@@ -4,16 +4,16 @@
 #include <stdexcept>
 #include <QHostAddress>
 #include <QTimer>
-#include "ClientManager.hpp"
+#include "EndpointManager.hpp"
 
 using namespace std;
 
-MessageServer::MessageServer(ClientManager* clientManager, QTcpSocket* socket, QObject* parent)
-	: MessageEndpoint(clientManager, socket, parent)
+MessageServer::MessageServer(EndpointManager* endpointManager, QTcpSocket* socket, QObject* parent)
+	: MessageEndpoint(endpointManager, socket, parent)
 {
 	//Client has already connected at this point.
 	//Server asks client for identification.
-	requestIdentity();
+	mIdentityExchange->requestIdentity();
 	//Client identifies.
 	//Client asks for identification.
 }

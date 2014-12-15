@@ -1,8 +1,8 @@
 #include "SelectEndpointsDialog.hpp"
 
 
-SelectEndpointsDialog::SelectEndpointsDialog(ClientManager* clientManager, QWidget* parent)
-	: QDialog(parent), mClientManager(clientManager)
+SelectEndpointsDialog::SelectEndpointsDialog(EndpointManager* endpointManager, QWidget* parent)
+	: QDialog(parent), mEndpointManager(endpointManager)
 {
 	setWindowModality(Qt::WindowModal);
 

@@ -35,7 +35,7 @@ ChatGroup* ChatWindow::group()
 
 void ChatWindow::messageReadyToSend()
 {
-	ChatMessage message(MessageFlags(PRIVATE, UTF8), mInputBox->text());
+	ChatMessage message(MessageFlags(MessageType::PRIVATE, MessageFormat::UTF8), mInputBox->text());
 	mGroup->messageAll(&message);
 	addMessageBox("Me:" + message.messageDataAsUTF8String());
 	mInputBox->clear();
@@ -58,7 +58,10 @@ void ChatWindow::addMessageBox(QString messageDisplayString)
 	QString messageString = messageDisplayString.section(':', 1);
 
 	cerr << "[ChatWindow] Probable memory leak in addMessageBox(QString)" << endl;
-	ChatMessage* newMessage = new ChatMessage(MessageFlags(PRIVATE, UTF8), messageString);
+	ChatMessage* newMessage = new ChatMessage(
+				MessageFlags(MessageType::PRIVATE, MessageFormat::UTF8),
+				messageString);
+
 	newMessage->setSender(sender);
 	MessageLabel* widget = new MessageLabel(newMessage);
 

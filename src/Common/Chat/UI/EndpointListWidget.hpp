@@ -7,7 +7,7 @@
 #include <QGridLayout>
 #include <QPushButton>
 #include <QMap>
-#include "../Network/ClientManager.hpp"
+#include "../Network/EndpointManager.hpp"
 #include "ChatWindow.hpp"
 #include "EndpointButton.hpp"
 
@@ -18,11 +18,11 @@ private:
 	QList<ChatGroup*> mChatGroups;
 	QMap<ChatGroup*, ChatWindow*> mChatWindows;
 	QList<EndpointButton*> mEndpointButtons;
-	ClientManager* mClientManager;
+	EndpointManager* mEndpointManager;
 
 	Q_OBJECT
 public:
-	explicit EndpointListWidget(ClientManager* clientManager, QWidget *parent = 0);
+	explicit EndpointListWidget(EndpointManager* endpointManager, QWidget *parent = 0);
 	virtual ~EndpointListWidget();
 
 signals:
