@@ -5,33 +5,40 @@
 #include <QStringList>
 #include <QChar>
 #include <QByteArray>
-#include "MessageFlags.hpp"
+#include <QJsonObject>
+#include <QJsonDocument>
+#include <QVariant>
+#include <QMap>
 
 class ChatMessage
 {
-private:
-	const char LIST_DELIMITER = ',';
-	const int MINIMUM_MESSAGE_BYTES = MessageFlags::FLAG_SECTION_BYTES;
-
-	QByteArray mMessageData;
-	QString mSender = "SENDER_DEFAULT";
-	MessageFlags mMessageFlags;
-
-	void processRawData(QByteArray rawData);
-	void processStringData(QByteArray messageByteArray);
 public:
-	ChatMessage(QByteArray messageByteArray, QString sender);
-	ChatMessage(MessageFlags flags, QString message);
-	ChatMessage(MessageFlags flags, QByteArray messageData);
+	enum MessageType
+	{
+		RESOURCE_EXCHANGE,
+		PRIVATE,
+		ERROR
+	};
+private:
+	QString mSender = "SENDER_DEFAULT";
+	const int LOCAL_API_LEVEL = 1;
+	QVariantMap mSectionMap;
+protected:
+	MessageType mMessageType;
+public:
+	ChatMessage(QJsonDocument json, QString sender);
+	ChatMessage(MessageType type);
+
+	void addSection(QString sectionName, const QVariant data);
+	QVariantMap& sections();
+	QVariant& section(QString sectionName);
+	const QJsonDocument jsonDocument();
 
 	QString sender();
 	void setSender(QString sender);
 
-	QString messageDataAsUTF8String() const;
-	QByteArray messageData() const;
-	QByteArray rawMessageBytes();
-
-	MessageFlags flags();
+	MessageType type();
+	void setType(MessageType type);
 };
 
 #endif // CHATMESSAGE_HPP

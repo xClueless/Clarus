@@ -2,68 +2,70 @@
 #include <stdexcept>
 #include <iostream>
 #include <QDataStream>
+#include <QJsonArray>
 
 using namespace std;
 
-ChatMessage::ChatMessage(QByteArray messageByteArray, QString sender)
+ChatMessage::ChatMessage(QJsonDocument json, QString sender) : mSender(sender)
 {
-	if(messageByteArray.size() < MINIMUM_MESSAGE_BYTES)
+	QJsonObject rootObject = json.object();
+	mSectionMap = rootObject.toVariantMap();
+
+	if(!rootObject.contains("API-Level"))
 	{
-		QString errorString = "[ChatMessage] Failed to parse message. It only has " + QString::number(mMessageData.size()) + " bytes however " + QString::number(MINIMUM_MESSAGE_BYTES) + " bytes are required.";
-		throw runtime_error(errorString.toStdString());
+		throw runtime_error("[ChatMessage] Cannot parse. Remote did not provide an API level.");
+	}
+	if(!rootObject.contains("MessageType"))
+	{
+		throw runtime_error("[ChatMessage] Cannot parse. Remote did not provide a message type.");
 	}
 
-	mMessageFlags = MessageFlags(messageByteArray.left(MessageFlags::FLAG_SECTION_BYTES));
-	messageByteArray.remove(0, MessageFlags::FLAG_SECTION_BYTES);
-
-	if(messageByteArray.size() <= 0)
+	if(mSectionMap["API-Level"].toInt() > LOCAL_API_LEVEL)
 	{
-		throw runtime_error("[ChatMessage] Failed to parse message. Data section is empty.");
+		throw runtime_error("[ChatMessage] Cannot parse. Remote has a higher API level.");
 	}
-	mMessageData = messageByteArray;
-	mSender = sender;
+
+	mMessageType = (MessageType) rootObject["MessageType"].toInt();
 }
-ChatMessage::ChatMessage(MessageFlags flags, QString message) : mMessageFlags(flags)
+ChatMessage::ChatMessage(MessageType type) : mMessageType(type)
 {
-	mMessageData = message.toUtf8();
+	addSection("API-Level", QVariant(LOCAL_API_LEVEL));
+	addSection("Message-Type", QVariant(mMessageType));
+
+}
+void ChatMessage::addSection(QString sectionName, const QVariant data)
+{
+	mSectionMap[sectionName] = data;
 }
 
-ChatMessage::ChatMessage(MessageFlags flags, QByteArray messageData)
-	: mMessageData(messageData), mMessageFlags(flags)
+QVariantMap& ChatMessage::sections()
 {
-}
-QString ChatMessage::messageDataAsUTF8String() const
-{
-	if(mMessageFlags.format() == MessageFormat::RAW)
-	{
-		return "RAW_MESSAGE";
-	}
-	return QString::fromUtf8(mMessageData);
-}
-QByteArray ChatMessage::messageData() const
-{
-	return mMessageData;
+	return mSectionMap;
 }
 
-QByteArray ChatMessage::rawMessageBytes()
+QVariant& ChatMessage::section(QString sectionName)
 {
-	QByteArray messageByteArray;
-	messageByteArray += mMessageFlags.flagBytes();
-	messageByteArray += mMessageData;
-	return messageByteArray;
+	return mSectionMap[sectionName];
 }
-
+const QJsonDocument ChatMessage::jsonDocument()
+{
+	QJsonDocument json = QJsonDocument(QJsonObject::fromVariantMap(mSectionMap));
+	return json;
+}
 QString ChatMessage::sender()
 {
 	return mSender;
 }
-
 void ChatMessage::setSender(QString sender)
 {
 	mSender = sender;
 }
-
-MessageFlags ChatMessage::flags()
+ChatMessage::MessageType ChatMessage::type()
 {
-	return mMessageFlags;
+	return mMessageType;
+}
+
+void ChatMessage::setType(ChatMessage::MessageType type)
+{
+	mMessageType = type;
 }

@@ -4,6 +4,14 @@
 
 #include <thread>
 
+//#include "Video/VideoServer.hpp"
+//#include "Video/RemoteVideoFeed.hpp"
+
+//#include "Audio/AudioUtil.hpp"
+//#include "Audio/AudioBouncer.hpp"
+
+//#include "TimeUtil.h"
+
 #include <QApplication>
 #include "Chat/Network/EndpointManager.hpp"
 #include "Chat/UI/ChatWindow.hpp"
@@ -11,6 +19,7 @@
 #include "Chat/UI/LoginWidget.hpp"
 
 using namespace std;
+using namespace cv;
 
 #define VIDEO_SERVER_PORT 9007
 #define AUDIO_SERVER_PORT 9008

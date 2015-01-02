@@ -20,9 +20,3 @@ void MessageClient::connectToServer(QString clientHostname, quint16 mPort)
 	cout << "[MessageClient] Connecting to server: " << clientHostname.toStdString() << endl;
 	mSocket->connectToHost(clientHostname, mPort, QIODevice::ReadWrite);
 }
-
-void MessageClient::handleInternalMessage(ChatMessage* request)
-{
-	cout << "[MessageClient] Passing internal message down." << endl;
-	MessageEndpoint::handleInternalMessage(request);
-}

@@ -10,8 +10,6 @@ private:
 	Q_OBJECT
 public:
 	explicit MessageServer(EndpointManager* clientManager, QTcpSocket* socket, QObject* parent = 0);
-public slots:
-	void handleInternalMessage(ChatMessage* m);
 };
 
 #endif // MESSAGECLIENT_HPP

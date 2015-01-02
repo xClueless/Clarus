@@ -4,15 +4,15 @@
 #include <QObject>
 #include <QString>
 #include <QTcpSocket>
+#include <QMap>
 #include <QPixmap>
 #include "NetworkStream.hpp"
 #include "../ChatMessage.hpp"
 #include "../ConnectionError.hpp"
 #include "../Identity.hpp"
-#include "IdentityExchange.hpp"
+#include "../Resource/RemoteResource.hpp"
 
 class EndpointManager;
-class IdentityExchange;
 
 class MessageEndpoint : public QObject
 {
@@ -23,21 +23,11 @@ protected:
 	QString mRemoteName = "UNKNOWN_REMOTE";
 	QTcpSocket* mSocket;
 	NetworkStream mNetworkStream;
+	QMap<QString, ChatResource*> mSharedResources;
 
-	IdentityExchange* mIdentityExchange;
+	RemoteResource* mRemoteIdentity;
 
 	QPixmap mRemotePixmap;
-
-	virtual void handleInternalMessage(ChatMessage* m);
-
-	void sendIdentity();
-	void identityRecieved(QString remoteName);
-
-	void handlePixmapExchangeMessage(ChatMessage* pixmapMessage);
-	void recievePixmap(ChatMessage* m);
-	void sendPixmap();
-	void sendIdentError();
-
 	QString pixmapStateString();
 public:
 	explicit MessageEndpoint(EndpointManager* endpointManager, QTcpSocket* socket, QObject *parent = 0);
@@ -61,8 +51,6 @@ public slots:
 	void writeChatMessage(ChatMessage* m);
 	void requestPixmap();
 	void notifyRemoteAboutPixmapUpdate();
-	void writeInternalMessageString(QString messageString, MessageType type);
-	void writeInternalMessageBytes(QByteArray messageBytes, MessageType type, MessageFormat format);
 };
 
 #endif // MESSAGEENDPOINT_HPP
