@@ -4,6 +4,7 @@
 #include <QBuffer>
 #include <QDebug>
 #include "EndpointManager.hpp"
+#include "../Resource/ResourceMessage.hpp"
 
 using namespace std;
 
@@ -43,9 +44,10 @@ void MessageEndpoint::readChatMessage(QByteArray messageBytes)
 //		cout << "[MessageEndpoint] Message: " << m->messageString().toStdString() << endl;
 		if(m->type() == ChatMessage::MessageType::RESOURCE_EXCHANGE)
 		{
-			if(m->sections().contains("ResourceName"))
+			ResourceMessage rm(m);
+			if(!rm.resourceName().isEmpty())
 			{
-				mSharedResources[m->section("ResourceName").toString()]->handleMessage(m);
+				mSharedResources[m->section("ResourceName").toString()]->handleResourceMessage(&rm);
 			}
 			else
 			{
