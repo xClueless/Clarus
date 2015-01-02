@@ -42,8 +42,10 @@ protected slots:
 	void readChatMessage(QByteArray messageBytes);
 	void handleSocketError(QAbstractSocket::SocketError error);
 	void handleProtocolError(QString error);
+	void connected();
 public slots:
 	void writeChatMessage(ChatMessage* m);
+
 };
 
 #endif // MESSAGEENDPOINT_HPP

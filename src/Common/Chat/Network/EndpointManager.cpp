@@ -46,10 +46,10 @@ bool EndpointManager::isLocalAddress(QString remoteName)
 
 void EndpointManager::handleConnectionFailure(ConnectionError connectionError)
 {
+	qDebug() << "Connection error." << connectionError.errorString();
 	MessageEndpoint* me = qobject_cast<MessageEndpoint*>(sender());
 	if(me != NULL)
 	{
-		qDebug() << "Connection error." << connectionError.errorString();
 		mEndpoints.removeAll(me);
 		delete me;
 	}
@@ -75,8 +75,8 @@ void EndpointManager::endpointInitialisedConnection()
 
 	if(endpointIsConnected(endpointString))
 	{
-		qDebug() << "[EndpointManager] Client with address " << endpointString << " is already connected" << endl;
-		qDebug() << "[EndpointManager] TODO Send notification of socket closure with a reason for doing so." << endl;
+		qWarning() << "[EndpointManager] Client with address " << endpointString << " is already connected" << endl;
+		qWarning() << "[EndpointManager] TODO Send notification of socket closure with a reason for doing so." << endl;
 		newClient->close();
 		delete newClient;
 		return;

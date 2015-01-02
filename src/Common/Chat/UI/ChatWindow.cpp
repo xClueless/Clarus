@@ -59,7 +59,7 @@ void ChatWindow::addMessageBox(QString messageDisplayString)
 	QString sender = messageDisplayString.section(':', 0, 0);
 	QString messageString = messageDisplayString.section(':', 1);
 
-	cerr << "[ChatWindow] Probable memory leak in addMessageBox(QString)" << endl;
+	qWarning() << "[ChatWindow] Probable memory leak in addMessageBox(QString)" << endl;
 	ChatMessage* newMessage = new ChatMessage(ChatMessage::MessageType::PRIVATE);
 	newMessage->addSection("Message", messageString);
 

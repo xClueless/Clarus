@@ -10,8 +10,9 @@ using namespace std;
 MessageEndpoint::MessageEndpoint(EndpointManager* endpointManager, QTcpSocket* socket, QObject *parent) :
 	QObject(parent), mEndpointManager(endpointManager), mSocket(socket), mNetworkStream(mSocket)
 {
-	connect(&mNetworkStream, SIGNAL(messageReady(QByteArray)), this, SLOT(readChatMessage(QByteArray)));
 	connect(mSocket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(handleSocketError(QAbstractSocket::SocketError)));
+	connect(&mNetworkStream, SIGNAL(messageReady(QByteArray)), this, SLOT(readChatMessage(QByteArray)));
+	connect(mSocket, SIGNAL(connected()), this, SLOT(connected()));
 
 	connect(mRemoteIdentity.name(), SIGNAL(writeChatMessage(ChatMessage*)), this, SLOT(writeChatMessage(ChatMessage*)));
 	connect(mRemoteIdentity.picture(), SIGNAL(writeChatMessage(ChatMessage*)), this, SLOT(writeChatMessage(ChatMessage*)));
@@ -98,3 +99,9 @@ void MessageEndpoint::handleProtocolError(QString error)
 
 	qDebug() << error << endl;
 }
+void MessageEndpoint::connected()
+{
+	mRemoteIdentity.name()->requestResource();
+	mRemoteIdentity.picture()->requestResource();
+}
+
