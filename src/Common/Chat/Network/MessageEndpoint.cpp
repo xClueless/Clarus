@@ -45,9 +45,9 @@ void MessageEndpoint::readChatMessage(QByteArray messageBytes)
 		if(m->type() == ChatMessage::MessageType::RESOURCE_EXCHANGE)
 		{
 			ResourceMessage rm(m);
-			if(!rm.resourceName().isEmpty())
+			if(mSharedResources.contains(rm.resourceName()))
 			{
-				mSharedResources[m->section("ResourceName").toString()]->handleResourceMessage(&rm);
+				mSharedResources[rm.resourceName()]->handleResourceMessage(&rm);
 			}
 			else
 			{
