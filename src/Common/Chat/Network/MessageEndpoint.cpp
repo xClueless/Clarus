@@ -48,7 +48,7 @@ void MessageEndpoint::readChatMessage(QByteArray messageBytes)
 			}
 			else
 			{
-				qDebug() << "[MessageEndpoint] Error. Resource is not registered.";
+				qCritical() << "[MessageEndpoint] Error. Resource" << m->section("ResourceName").toString() << "is not registered.";
 			}
 		}
 		else if(m->type() == ChatMessage::MessageType::PRIVATE)
