@@ -38,6 +38,7 @@ void MessageEndpoint::readChatMessage(QByteArray messageBytes)
 	try
 	{
 		QJsonDocument json = QJsonDocument::fromJson(messageBytes);
+		qDebug() << "[MessageEndpoint] Recieved JSON: " << json;
 		ChatMessage* m = new ChatMessage(json, "");
 //		cout << "[MessageEndpoint] Message: " << m->messageString().toStdString() << endl;
 		if(m->type() == ChatMessage::MessageType::RESOURCE_EXCHANGE)
@@ -48,7 +49,7 @@ void MessageEndpoint::readChatMessage(QByteArray messageBytes)
 			}
 			else
 			{
-				qCritical() << "[MessageEndpoint] Error. Resource" << m->section("ResourceName").toString() << "is not registered.";
+				qCritical() << "[MessageEndpoint] RESOURCE_EXCHANGE message does not contain a ResourceName field.";
 			}
 		}
 		else if(m->type() == ChatMessage::MessageType::PRIVATE)

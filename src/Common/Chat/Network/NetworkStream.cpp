@@ -26,7 +26,7 @@ void NetworkStream::readMessageSize()
 	QByteArray messageSizeArray = readBytesFromSocket(mSocket, sizeof(mMessageSize));
 	QDataStream byteStream(&messageSizeArray, QIODevice::ReadOnly);
 	byteStream >> mMessageSize;
-	qDebug() << "[NetworkStream] Message has size: " << mMessageSize;
+//	qDebug() << "[NetworkStream] Message has size: " << mMessageSize;
 }
 
 void NetworkStream::readAvailableData()
@@ -60,7 +60,7 @@ void NetworkStream::readAvailableData()
 void NetworkStream::writeMessage(QString message)
 {
 	QByteArray messageBytes = message.toUtf8();
-	qDebug() << "[NetworkStream] WRITE-MESSAGE '" << message << "' SIZE: " << message.length();
+//	qDebug() << "[NetworkStream] WRITE-MESSAGE '" << message << "' SIZE: " << message.length();
 	writeMessage(messageBytes);
 }
 
@@ -73,15 +73,15 @@ void NetworkStream::writeMessage(QByteArray messageBytes)
 	byteStream << messageSize;
 
 	mSocket->write(sizeArray);
-	qDebug() << "[NetworkStream] Sent message size." << endl;
+//	qDebug() << "[NetworkStream] Sent message size." << endl;
 
 	mSocket->write(messageBytes);
-	qDebug() << "[NetworkStream] Sent message data." << endl;
+//	qDebug() << "[NetworkStream] Sent message data." << endl;
 }
 
 void NetworkStream::dataRecieved()
 {
-	qDebug() << "[NetworkStream] dataRecieved()" << endl;
+//	qDebug() << "[NetworkStream] dataRecieved()" << endl;
 	if(mSocket->bytesAvailable() > 0)
 	{
 		if(!mProcessingMessage)
