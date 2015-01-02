@@ -22,9 +22,10 @@ private:
 	QGroupBox* mCredentialBox;
 	QPushButton* mLoginButton;
 	MainWindow* mMainWindow;
+	LocalIdentity* mLocalIdentity;
 
 public:
-	explicit LoginWidget(EndpointManager* endpointManager, QWidget *parent = 0);
+	explicit LoginWidget(LocalIdentity* identity, EndpointManager* endpointManager, QWidget *parent = 0);
 	virtual ~LoginWidget();
 	void createCredentialBox();
 	MainWindow* mainWindow();

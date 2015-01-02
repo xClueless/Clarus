@@ -37,15 +37,14 @@ public:
 	explicit ChatResource(QString resourceName, QObject *parent = 0);
 	~ChatResource();
 	QByteArray& data();
-	QString utf8Data();
-	ResourceState state();
+	ResourceState state() const;
+	QString resourceName() const;
 protected:
 	void setData(QByteArray& bytes);
-	void setDataUtf8(QString& utf8);
 	void setState(ResourceState state);
 signals:
 	void stateChanged();
-	void resourceChanged();
+	void dataChanged();
 public slots:
 	void handleMessage(ChatMessage* m);
 	virtual void handleResourceMessage(ResourceMessage* rm)=0;

@@ -14,7 +14,7 @@ public:
 	~RemoteResource();
 	void setAutoRefresh(bool autoRefresh);
 protected slots:
-	void recieveResource(ResourceMessage* m);
+	virtual void recieveResource(ResourceMessage* m);
 public slots:
 	void handleResourceMessage(ResourceMessage* request);
 	void requestResource();

@@ -14,7 +14,7 @@ public:
 	explicit MessageHandler(QString handlerName, QObject* parent=0);
 
 	~MessageHandler();
-	QString name();
+	QString messageHandlerName();
 signals:
 	void writeChatMessage(ChatMessage* m);
 public slots:

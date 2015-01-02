@@ -1,11 +1,9 @@
 #include "NetworkStream.hpp"
 
 #include <QEventLoop>
-#include <iostream>
+#include <QDebug>
 #include <QTextCodec>
 #include "NetUtil.hpp"
-
-using namespace std;
 
 NetworkStream::NetworkStream(QAbstractSocket* socket, QObject *parent) :
 	QObject(parent), mSocket(socket)
@@ -28,7 +26,7 @@ void NetworkStream::readMessageSize()
 	QByteArray messageSizeArray = readBytesFromSocket(mSocket, sizeof(mMessageSize));
 	QDataStream byteStream(&messageSizeArray, QIODevice::ReadOnly);
 	byteStream >> mMessageSize;
-//	cout << "[NetworkStream] Message has size: " << mMessageSize << endl;
+	qDebug() << "[NetworkStream] Message has size: " << mMessageSize;
 }
 
 void NetworkStream::readAvailableData()
@@ -40,7 +38,7 @@ void NetworkStream::readAvailableData()
 	{
 		while(true)
 		{
-			cerr << "Message size is not positive. This is a bug." << endl;
+			qCritical() << "Message size is not positive. This is a bug." << endl;
 			exit(-1);
 		}
 	}
@@ -50,19 +48,19 @@ void NetworkStream::readAvailableData()
 	{
 		while(true)
 		{
-			cerr << "Size diff is not positive. This is a bug." << endl;
+			qCritical() << "Size diff is not positive. This is a bug." << endl;
 		}
 	}
 
 	QByteArray newData = readBytesFromSocket(mSocket, sizeDiff);
 	mMessageBuffer += newData;
-//	cout << "[NetworkStream] Read " << newData.size() << " bytes of new data." << endl;
+	qDebug() << "[NetworkStream] Read " << newData.size() << " bytes of new data.";
 }
 
 void NetworkStream::writeMessage(QString message)
 {
 	QByteArray messageBytes = message.toUtf8();
-	cout << "[NetworkStream] WRITE-MESSAGE '" << message.toStdString() << "' SIZE: " << message.length() << endl;
+	qDebug() << "[NetworkStream] WRITE-MESSAGE '" << message << "' SIZE: " << message.length();
 	writeMessage(messageBytes);
 }
 
@@ -75,15 +73,15 @@ void NetworkStream::writeMessage(QByteArray messageBytes)
 	byteStream << messageSize;
 
 	mSocket->write(sizeArray);
-//	cout << "[NetworkStream] Sent message size." << endl;
+	qDebug() << "[NetworkStream] Sent message size." << endl;
 
 	mSocket->write(messageBytes);
-	//	cout << "[NetworkStream] Sent message data." << endl;
+	qDebug() << "[NetworkStream] Sent message data." << endl;
 }
 
 void NetworkStream::dataRecieved()
 {
-//	cout << "[NetworkStream] dataRecieved()" << endl;
+	qDebug() << "[NetworkStream] dataRecieved()" << endl;
 	if(mSocket->bytesAvailable() > 0)
 	{
 		if(!mProcessingMessage)

@@ -12,8 +12,7 @@ public:
 	~LocalResource();
 
 public slots:
-	void setResourceBytes(QByteArray bytes);
-	void setResourceUTF8(QString utf8);
+	void setData(QByteArray bytes);
 public slots:
 	void handleResourceMessage(ResourceMessage* m);
 };

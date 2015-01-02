@@ -1,9 +1,12 @@
 #include "ChatResource.hpp"
 
+#include <QDebug>
+
 void ChatResource::sendStateUpdate()
 {
 	ChatMessage cm(ChatMessage::RESOURCE_EXCHANGE);
 	ResourceMessage rm(&cm, mResourceName, mResourceState);
+	qDebug() << "[ChatResource:" << mResourceName << "] Sending state update";
 	writeChatMessage(&cm);
 }
 
@@ -11,6 +14,7 @@ void ChatResource::sendDataUpdate()
 {
 	ChatMessage cm(ChatMessage::RESOURCE_EXCHANGE);
 	ResourceMessage rm(&cm, mResourceName, mResourceData);
+	qDebug() << "[ChatResource: " << mResourceName << "] Sending data update";
 	writeChatMessage(&cm);
 }
 
@@ -27,30 +31,25 @@ QByteArray& ChatResource::data()
 {
 	return mResourceData;
 }
-
-QString ChatResource::utf8Data()
-{
-	return QString::fromUtf8(mResourceData);
-}
-
-ChatResource::ResourceState ChatResource::state()
+ChatResource::ResourceState ChatResource::state() const
 {
 	return mResourceState;
 }
 
-void ChatResource::setData(QByteArray& bytes)
+QString ChatResource::resourceName() const
 {
-	mResourceData = bytes;
-	emit resourceChanged();
-}
-void ChatResource::setDataUtf8(QString& utf8)
-{
-	QByteArray data = utf8.toUtf8();
-	setData(data);
+	return mResourceName;
 }
 
+void ChatResource::setData(QByteArray& bytes)
+{
+	qDebug() << "[ChatResource:" << mResourceName << "] Data changed";
+	mResourceData = bytes;
+	emit dataChanged();
+}
 void ChatResource::setState(ChatResource::ResourceState state)
 {
+	qDebug() << "[ChatResource:" << mResourceName << "] State changed from" <<mResourceState << "to" << state;
 	mResourceState = state;
 	emit stateChanged();
 }

@@ -8,7 +8,7 @@ EndpointListWidget::EndpointListWidget(EndpointManager* endpointManager, QWidget
 	mLayout = new QGridLayout(this);
 	setLayout(mLayout);
 
-	connect(mEndpointManager, SIGNAL(endpointIdentified(MessageEndpoint*)), this, SLOT(endpointIdentified(MessageEndpoint*)));
+	connect(mEndpointManager, SIGNAL(endpointConnected(MessageEndpoint*)), this, SLOT(endpointIdentified(MessageEndpoint*)));
 }
 
 EndpointListWidget::~EndpointListWidget()

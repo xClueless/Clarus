@@ -9,7 +9,7 @@ MessageHandler::~MessageHandler()
 {
 }
 
-QString MessageHandler::name()
+QString MessageHandler::messageHandlerName()
 {
 	return mHandlerName;
 }

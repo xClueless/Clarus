@@ -12,18 +12,23 @@ MessageEndpoint::MessageEndpoint(EndpointManager* endpointManager, QTcpSocket* s
 {
 	connect(&mNetworkStream, SIGNAL(messageReady(QByteArray)), this, SLOT(readChatMessage(QByteArray)));
 	connect(mSocket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(handleSocketError(QAbstractSocket::SocketError)));
-	connect(mEndpointManager, SIGNAL(localPixmapChanged()), this, SLOT(notifyRemoteAboutPixmapUpdate()));
 
+	connect(mRemoteIdentity.name(), SIGNAL(writeChatMessage(ChatMessage*)), this, SLOT(writeChatMessage(ChatMessage*)));
+	connect(mRemoteIdentity.picture(), SIGNAL(writeChatMessage(ChatMessage*)), this, SLOT(writeChatMessage(ChatMessage*)));
 
-	mRemoteIdentity = new RemoteResource("EndpointName", this);
-
-	connect(mRemoteIdentity, SIGNAL(writeChatMessage(ChatMessage*)), this, SLOT(writeChatMessage(ChatMessage*)));
+	mSharedResources[mRemoteIdentity.name()->resourceName()] = mRemoteIdentity.name();
+	mSharedResources[mRemoteIdentity.picture()->resourceName()] = mRemoteIdentity.picture();
 }
 
 MessageEndpoint::~MessageEndpoint()
 {
 	mSocket->close();
 	delete mSocket;
+}
+
+RemoteIdentity* MessageEndpoint::identity()
+{
+	return &mRemoteIdentity;
 }
 
 void MessageEndpoint::readChatMessage(QByteArray messageBytes)
@@ -63,23 +68,14 @@ void MessageEndpoint::readChatMessage(QByteArray messageBytes)
 
 void MessageEndpoint::writeChatMessage(ChatMessage* m)
 {
-	qDebug() << "[MessageEndpoint] Writing message";
+	qDebug() << "[MessageEndpoint] Writing message:";
+	qDebug() << m->jsonDocument();
 	mNetworkStream.writeMessage(m->jsonDocument().toJson());
-}
-
-QString MessageEndpoint::remoteName()
-{
-	return mRemoteName;
 }
 
 QTcpSocket* MessageEndpoint::socket()
 {
 	return mSocket;
-}
-
-QPixmap& MessageEndpoint::remotePixmap()
-{
-	return mRemotePixmap;
 }
 
 bool MessageEndpoint::operator ==(MessageEndpoint* endpoint)

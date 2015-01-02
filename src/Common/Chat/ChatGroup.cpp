@@ -33,8 +33,9 @@ void ChatGroup::addEndpoint(MessageEndpoint* endpoint)
 {
 	mEndpoints << endpoint;
 	connect(endpoint, SIGNAL(messageReady(ChatMessage*)), this, SLOT(endpointHasNewMessage(ChatMessage*)));
-	connect(endpoint, SIGNAL(remoteNameChanged()), this, SLOT(endpointNameHasChanged()));
-	connect(endpoint, SIGNAL(remotePixmapChanged()), this, SLOT(endpointPixmapHasChanged()));
+
+	connect(endpoint->identity()->name(), SIGNAL(dataChanged()), this, SLOT(endpointNameHasChanged()));
+	connect(endpoint->identity()->picture(), SIGNAL(dataChanged()), this, SLOT(endpointPictureHasChanged()));
 }
 
 void ChatGroup::removeEndpoint(MessageEndpoint* endpoint)
@@ -54,7 +55,7 @@ QStringList ChatGroup::endpointRemoteNames()
 
 	for(MessageEndpoint* endpoint : mEndpoints)
 	{
-		endpointNames << endpoint->remoteName();
+		endpointNames << endpoint->identity()->name()->string();
 	}
 	return endpointNames;
 }
@@ -71,11 +72,11 @@ QString ChatGroup::groupName()
 	}
 }
 
-QPixmap& ChatGroup::groupPixmap()
+const QPixmap& ChatGroup::groupPixmap()
 {
 	if(mEndpoints.size() == 1)
 	{
-		return mEndpoints.front()->remotePixmap();
+		return mEndpoints.front()->identity()->picture()->pixmap();
 	}
 	return mGroupPixmap;
 }
@@ -87,19 +88,17 @@ void ChatGroup::endpointHasNewMessage(ChatMessage* m)
 
 void ChatGroup::endpointNameHasChanged()
 {
-	emit remoteNameChanged();
-
 	if(groupName().isEmpty())
 	{
 		emit groupNameChanged();
 	}
 }
 
-void ChatGroup::endpointPixmapHasChanged()
+void ChatGroup::endpointPictureHasChanged()
 {
 	if(mEndpoints.size() == 1)
 	{
-		setGroupPixmap(mEndpoints.front()->remotePixmap());
+		setGroupPixmap(mEndpoints.front()->identity()->picture()->pixmap());
 	}
 }
 

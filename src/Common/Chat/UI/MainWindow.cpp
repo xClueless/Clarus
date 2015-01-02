@@ -3,15 +3,15 @@
 #include <QInputDialog>
 #include <QMessageBox>
 
-MainWindow::MainWindow(EndpointManager* endpointManager, QWidget* parent)
-	: QWidget(parent), mEndpointManager(endpointManager)
+MainWindow::MainWindow(LocalIdentity* identity, EndpointManager* endpointManager, QWidget* parent)
+	: QWidget(parent), mEndpointManager(endpointManager), mLocalIdentity(identity)
 {
-	connect(mEndpointManager, SIGNAL(failedToConnectToEndpoint(MessageEndpoint*, ConnectionError)), this, SLOT(endpointFailedToConnect(MessageEndpoint*, ConnectionError)));
+	connect(mEndpointManager, SIGNAL(connectionFailed(MessageEndpoint*,ConnectionError)), this, SLOT(endpointFailedToConnect(MessageEndpoint*, ConnectionError)));
 
 	mLayout = new QVBoxLayout(this);
 	setLayout(mLayout);
 
-	mLocalIdentityWidget = new LocalIdentityWidget(mEndpointManager, this);
+	mLocalIdentityWidget = new LocalIdentityWidget(mLocalIdentity, this);
 	mLayout->addWidget(mLocalIdentityWidget);
 
 	mConnectToEndpointButton = new QPushButton("+", this);
@@ -33,7 +33,7 @@ MainWindow::~MainWindow()
 void MainWindow::connectToEndpoint()
 {
 	QString endpointRemoteName = QInputDialog::getText(this, "Connect to Endpoint", "Endpoint IP/Hostname");
-	mEndpointManager->connectToServer(endpointRemoteName);
+	mEndpointManager->connectToEndpoint(endpointRemoteName);
 }
 
 void MainWindow::endpointFailedToConnect(MessageEndpoint* endpoint, ConnectionError connectionError)

@@ -11,7 +11,7 @@ ChatMessage::ChatMessage(QJsonDocument json, QString sender) : mSender(sender)
 	QJsonObject rootObject = json.object();
 	mSectionMap = rootObject.toVariantMap();
 
-	if(!rootObject.contains("API-Level"))
+	if(!rootObject.contains("APILevel"))
 	{
 		throw runtime_error("[ChatMessage] Cannot parse. Remote did not provide an API level.");
 	}
@@ -29,9 +29,8 @@ ChatMessage::ChatMessage(QJsonDocument json, QString sender) : mSender(sender)
 }
 ChatMessage::ChatMessage(MessageType type) : mMessageType(type)
 {
-	addSection("API-Level", QVariant(LOCAL_API_LEVEL));
-	addSection("Message-Type", QVariant(mMessageType));
-
+	addSection("APILevel", QVariant(LOCAL_API_LEVEL));
+	addSection("MessageType", QVariant(mMessageType));
 }
 void ChatMessage::addSection(QString sectionName, const QVariant data)
 {

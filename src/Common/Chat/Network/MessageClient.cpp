@@ -12,7 +12,8 @@ MessageClient::MessageClient(EndpointManager* endpointManager, QTcpSocket* socke
 	//Server asks client for identification.
 	//Client identifies.
 	//Client asks for identification.
-	connect(this, SIGNAL(remoteIdentifiedUs()), this, SLOT(requestIdentity()));
+	mRemoteIdentity.name()->requestResource();
+	mRemoteIdentity.picture()->requestResource();
 }
 
 void MessageClient::connectToServer(QString clientHostname, quint16 mPort)

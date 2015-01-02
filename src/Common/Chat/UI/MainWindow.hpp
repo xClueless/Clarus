@@ -19,8 +19,10 @@ private:
 	QPushButton* mConnectToEndpointButton;
 	QPushButton* mBroadcastForEndpointsButton;
 	EndpointListWidget* mEndpointListWidget;
+	LocalIdentity* mLocalIdentity;
+
 public:
-	explicit MainWindow(EndpointManager* endpointManager, QWidget *parent = 0);
+	explicit MainWindow(LocalIdentity* identity, EndpointManager* endpointManager, QWidget *parent = 0);
 	virtual ~MainWindow();
 
 signals:

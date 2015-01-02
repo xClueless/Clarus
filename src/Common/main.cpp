@@ -4,22 +4,16 @@
 
 #include <thread>
 
-//#include "Video/VideoServer.hpp"
-//#include "Video/RemoteVideoFeed.hpp"
-
-//#include "Audio/AudioUtil.hpp"
-//#include "Audio/AudioBouncer.hpp"
-
-//#include "TimeUtil.h"
-
 #include <QApplication>
 #include "Chat/Network/EndpointManager.hpp"
 #include "Chat/UI/ChatWindow.hpp"
 #include "Chat/UI/MainWindow.hpp"
 #include "Chat/UI/LoginWidget.hpp"
+#include "Chat/ResourceManager.hpp"
+#include "Chat/Resource/LocalResource.hpp"
+#include "Chat/Identity/LocalIdentity.hpp"
 
 using namespace std;
-using namespace cv;
 
 #define VIDEO_SERVER_PORT 9007
 #define AUDIO_SERVER_PORT 9008
@@ -29,9 +23,16 @@ void qtThread(int argc, char** argv, options opts)
 {
 	QApplication a(argc, argv);
 
-	EndpointManager endpointManager(opts.clientName.data(), CHAT_SERVER_PORT);
+	QString clientName(opts.clientName.data());
+	LocalIdentity identity(clientName);
 
-	LoginWidget loginWidget(&endpointManager);
+	ResourceManager resourceManager;
+	resourceManager.addLocalResource(identity.name());
+	resourceManager.addLocalResource(identity.picture());
+
+	EndpointManager endpointManager(CHAT_SERVER_PORT);
+
+	LoginWidget loginWidget(&identity, &endpointManager);
 	loginWidget.show();
 //	MainWindow mainWindow(&endpointManager);
 //	mainWindow.show();

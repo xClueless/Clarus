@@ -31,25 +31,25 @@ ResourceMessage::ResourceMessage(ChatMessage* message)
 
 QString ResourceMessage::resourceName() const
 {
-	QVariantMap resourceNode = mMessage->section("Resource");
+	QVariantMap resourceNode = mMessage->section("Resource").value<QVariantMap>();;
 	return resourceNode["ResourceName"].toString();
 }
 
 int ResourceMessage::resourceState() const
 {
-	QVariantMap resourceNode = mMessage->section("Resource");
-	return resourceNode["ResourceState"].toString();
+	QVariantMap resourceNode = mMessage->section("Resource").value<QVariantMap>();;
+	return resourceNode["ResourceState"].toInt();
 }
 
 ResourceMessage::ResourceOperation ResourceMessage::resourceOperation() const
 {
-	QVariantMap resourceNode = mMessage->section("Resource");
-	return resourceNode["ResourceOperation"].toInt();
+	QVariantMap resourceNode = mMessage->section("Resource").value<QVariantMap>();;
+	return (ResourceOperation) resourceNode["ResourceOperation"].toInt();
 }
 
 QByteArray ResourceMessage::resourceData()
 {
-	QVariantMap& resourceNode = mMessage->section("Resource");
+	QVariantMap resourceNode = mMessage->section("Resource").value<QVariantMap>();
 	return resourceNode["ResourceData"].toByteArray();
 }
 

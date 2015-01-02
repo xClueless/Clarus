@@ -17,49 +17,29 @@
 class EndpointManager : public QObject
 {
 private:
-        Q_OBJECT
-        const QString BROADCAST_CONNECT_STRING = "CONNECT_BACK";
-        const QString DEFAULT_PIXMAP_URL = ":/images/default-contact-icon.png";
+		Q_OBJECT
+		const QString BROADCAST_CONNECT_STRING = "CONNECT_BACK";
 
-        QTcpServer* mServerSocket;
-        QUdpSocket* mBroadcastSocket;
-        uint32_t mPort;
+		QTcpServer* mServerSocket;
+		QUdpSocket* mBroadcastSocket;
+		uint32_t mPort;
 
-        QString mLocalName;
-        QPixmap mLocalPixmap;
-
-        QList<MessageEndpoint*> mIdentifiedEndpoints;
-        QList<MessageServer*> mServersThatNeedIdentification;
-        QList<MessageClient*> mClientsThatNeedToIdentify;
-
-        void addEnpointAsIdentified(MessageEndpoint* endpoint);
+		QList<MessageEndpoint*> mEndpoints;
 public:
-        explicit EndpointManager(QString name, uint32_t port, QObject *parent = 0);
-        QList<MessageEndpoint*> identifiedEndpoints();
-        bool endpointIsConnected(QString remoteName);
-        bool isLocalAddress(QString remoteName);
-
-        QString localName();
-        QPixmap& localPixmap();
-
+		explicit EndpointManager(uint32_t port, QObject *parent = 0);
+		bool endpointIsConnected(QString remoteName);
+		bool isLocalAddress(QString remoteName);
 signals:
-        void endpointIdentified(MessageEndpoint* endpoint);
-        void failedToConnectToEndpoint(MessageEndpoint* endpoint, ConnectionError connectionError);
-        void localNameChanged();
-        void localPixmapChanged();
+		void endpointConnected(MessageEndpoint* endpoint);
+		void connectionFailed(MessageEndpoint* endpoint, ConnectionError connectionError);
 protected slots:
-        void serverIdentifiedUs();
-        void serverFailedToIdentifyUs(ConnectionError connectionError);
-        void clientIdentified();
-        void clientFailedToIdentify(ConnectionError connectionError);
+		void handleConnectionFailure(ConnectionError connectionError);
+		void endpointInitialisedConnection();
+		void processDatagrams();
 public slots:
-        void start();
-        void newClientConnected();
-        void connectToServer(QString serverHostname);
-        void setLocalName(QString name);
-        void loadLocalPixmap(QString pixmapURL);
-        void sendBroadcast();
-        void processDatagrams();
+		void start();
+		void connectToEndpoint(QString serverHostname);
+		void sendBroadcast();
 };
 
 #endif // ENDPOINTMANAGER_HPP

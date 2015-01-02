@@ -35,15 +35,17 @@ ChatGroup* ChatWindow::group()
 
 void ChatWindow::messageReadyToSend()
 {
-	ChatMessage message(MessageFlags(MessageType::PRIVATE, MessageFormat::UTF8), mInputBox->text());
+	ChatMessage message(ChatMessage::MessageType::PRIVATE);
+	message.addSection("Message", mInputBox->text());
+
 	mGroup->messageAll(&message);
-	addMessageBox("Me:" + message.messageDataAsUTF8String());
+	addMessageBox("Me:" + mInputBox->text());
 	mInputBox->clear();
 }
 
 void ChatWindow::displayMessage(ChatMessage* m)
 {
-	addMessageBox(m->sender() + ":" + m->messageDataAsUTF8String());
+	addMessageBox(m->sender() + ":" + m->section("Message").toString());
 
 	QApplication::alert(this, 300);
 //	mMessageModel.setStringList(mMessages);
@@ -58,9 +60,8 @@ void ChatWindow::addMessageBox(QString messageDisplayString)
 	QString messageString = messageDisplayString.section(':', 1);
 
 	cerr << "[ChatWindow] Probable memory leak in addMessageBox(QString)" << endl;
-	ChatMessage* newMessage = new ChatMessage(
-				MessageFlags(MessageType::PRIVATE, MessageFormat::UTF8),
-				messageString);
+	ChatMessage* newMessage = new ChatMessage(ChatMessage::MessageType::PRIVATE);
+	newMessage->addSection("Message", messageString);
 
 	newMessage->setSender(sender);
 	MessageLabel* widget = new MessageLabel(newMessage);

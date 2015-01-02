@@ -15,7 +15,7 @@ void MessageLabel::setLabel(ChatMessage* m)
 		setAlignment(Qt::AlignRight | Qt::AlignTop);
 	}
 
-	setText(senderTags.arg(m->sender()) + m->messageDataAsUTF8String());
+	setText(senderTags.arg(m->sender()) + m->section("Message").toString());
 }
 
 MessageLabel::MessageLabel(ChatMessage* m, QWidget* parent)

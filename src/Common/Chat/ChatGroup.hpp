@@ -26,12 +26,12 @@ public:
 	void addEndpoint(MessageEndpoint* endpoint);
 	void removeEndpoint(MessageEndpoint* endpoint);
 	bool empty();
+
 	QStringList endpointRemoteNames();
 	QString groupName();
-	QPixmap& groupPixmap();
+	const QPixmap& groupPixmap();
 signals:
 	void messageReady(ChatMessage* m);
-	void remoteNameChanged();
 	void groupNameChanged();
 	void groupPixmapChanged();
 	void endpointRemoved(MessageEndpoint* endpoint);
@@ -39,7 +39,8 @@ signals:
 protected slots:
 	void endpointHasNewMessage(ChatMessage* m);
 	void endpointNameHasChanged();
-	void endpointPixmapHasChanged();
+	void endpointPictureHasChanged();
+
 public slots:
 	void messageAll(QString messageString);
 	void messageAll(ChatMessage* message);

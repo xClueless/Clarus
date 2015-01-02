@@ -2,8 +2,8 @@
 
 #include <QFileDialog>
 
-LocalIdentityWidget::LocalIdentityWidget(EndpointManager* endpointManager, QWidget* parent)
-	: QWidget(parent), mEndpointManager(endpointManager)
+LocalIdentityWidget::LocalIdentityWidget(LocalIdentity* localIdentity, QWidget* parent)
+	: QWidget(parent), mLocalIdentity(localIdentity)
 {
 	mLayout = new QHBoxLayout(this);
 	setLayout(mLayout);
@@ -17,23 +17,24 @@ LocalIdentityWidget::LocalIdentityWidget(EndpointManager* endpointManager, QWidg
 	mLayout->addWidget(mLocalNameLabel);
 
 	mLocalNameBox = new QLineEdit(this);
-	mLocalNameBox->setText(mEndpointManager->localName());
-	connect(mLocalNameBox, SIGNAL(returnPressed()), this, SLOT(sendNewLocalName()));
-	connect(mEndpointManager, SIGNAL(localNameChanged()), this, SLOT(retrieveNewLocalName()));
+	mLocalNameBox->setText(mLocalIdentity->name()->string());
+	connect(mLocalNameBox, SIGNAL(returnPressed()), this, SLOT(setLocalName()));
+
+	connect(mLocalIdentity->name(), SIGNAL(dataChanged()), this, SLOT(retrieveNewLocalName()));
+	connect(mLocalIdentity->picture(), SIGNAL(dataChanged()), this, SLOT(updatePixmap()));
 
 	mLayout->addWidget(mLocalNameBox);
 
-	connect(mEndpointManager, SIGNAL(localPixmapChanged()), this, SLOT(updatePixmap()));
 }
 
-void LocalIdentityWidget::sendNewLocalName()
+void LocalIdentityWidget::setLocalName()
 {
-	mEndpointManager->setLocalName(mLocalNameBox->text());
+	mLocalIdentity->name()->setString(mLocalNameBox->text());
 }
 
 void LocalIdentityWidget::retrieveNewLocalName()
 {
-	mLocalNameBox->setText(mEndpointManager->localName());
+	mLocalNameBox->setText(mLocalIdentity->name()->string());
 }
 
 void LocalIdentityWidget::selectNewPixmap()
@@ -41,11 +42,11 @@ void LocalIdentityWidget::selectNewPixmap()
 	QString pixmapFileName = QFileDialog::getOpenFileName(this, "Select Picture", QString(), "PNG Image (*.png)");
 	if(!pixmapFileName.isNull())
 	{
-		mEndpointManager->loadLocalPixmap(pixmapFileName);
+		mLocalIdentity->picture()->loadPixmap(pixmapFileName);
 	}
 }
 
 void LocalIdentityWidget::updatePixmap()
 {
-	mLocalPixmapButton->setIcon(QIcon(mEndpointManager->localPixmap()));
+	mLocalPixmapButton->setIcon(QIcon(mLocalIdentity->picture()->pixmap()));
 }
